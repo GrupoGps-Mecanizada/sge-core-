@@ -22,8 +22,10 @@
 
     if (window.SGECore) return; // já carregado
 
-    const VERSAO = '1.0.0';
-    const BASE = 'https://grupogps-mecanizada.github.io/sge-core/v1';
+    const VERSAO = '1.0.1';
+    // Descobre o próprio endereço (funciona com qualquer nome de repositório ou cópia local).
+    const _src = (document.currentScript && document.currentScript.src) || '';
+    const BASE = _src ? _src.replace(/\/[^/]*$/, '') : 'https://grupogps-mecanizada.github.io/sge-core/v1';
 
     // ── Conexão Supabase (uma por projeto) ──────────────────
     const _clientes = {};
