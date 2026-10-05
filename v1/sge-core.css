@@ -1,0 +1,173 @@
+/**
+ * SGE CORE v1 — visual padrão de todos os sistemas do SGE
+ * Uso: <link rel="stylesheet" href="https://grupogps-mecanizada.github.io/sge-core/v1/sge-core.css">
+ * Tudo começa com "sge-" para não brigar com o CSS que cada sistema já tem.
+ */
+
+/* ── Cores e medidas (tema claro) ─────────────────────── */
+:root {
+    --sge-marca: #1B3A6B;          /* azul-marinho do logo */
+    --sge-marca-escura: #0d1b2e;   /* menu lateral */
+    --sge-destaque: #1d4ed8;       /* botões e links */
+    --sge-destaque-hover: #1e40af;
+    --sge-destaque-suave: #1d4ed814;
+
+    --sge-sucesso: #15803d;
+    --sge-alerta: #b45309;
+    --sge-perigo: #c62828;
+    --sge-info: #0369a1;
+
+    --sge-fundo: #f0f3f8;
+    --sge-superficie: #ffffff;
+    --sge-superficie-2: #f5f7fb;
+    --sge-borda: #e1e6ef;
+
+    --sge-texto: #111827;
+    --sge-texto-2: #4b5563;
+    --sge-texto-3: #6b7280;
+
+    --sge-fonte: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --sge-fonte-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
+
+    --sge-raio: 10px;
+    --sge-raio-pequeno: 6px;
+    --sge-sombra: 0 1px 3px rgba(15, 23, 42, .08), 0 4px 12px rgba(15, 23, 42, .06);
+    --sge-sombra-forte: 0 12px 40px rgba(15, 23, 42, .25);
+    --sge-toque: 44px;             /* altura mínima de botão (dedo no tablet) */
+}
+
+/* ── Tema escuro (automático ou forçado com data-tema="escuro") ── */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) {
+        --sge-destaque: #3b82f6;
+        --sge-destaque-hover: #60a5fa;
+        --sge-destaque-suave: #3b82f61f;
+        --sge-sucesso: #22c55e;
+        --sge-alerta: #f59e0b;
+        --sge-perigo: #ef4444;
+        --sge-info: #38bdf8;
+        --sge-fundo: #0b1220;
+        --sge-superficie: #111a2c;
+        --sge-superficie-2: #16213a;
+        --sge-borda: #24324d;
+        --sge-texto: #f1f5f9;
+        --sge-texto-2: #cbd5e1;
+        --sge-texto-3: #94a3b8;
+    }
+}
+:root[data-tema="escuro"] {
+    --sge-destaque: #3b82f6;
+    --sge-destaque-hover: #60a5fa;
+    --sge-destaque-suave: #3b82f61f;
+    --sge-sucesso: #22c55e;
+    --sge-alerta: #f59e0b;
+    --sge-perigo: #ef4444;
+    --sge-info: #38bdf8;
+    --sge-fundo: #0b1220;
+    --sge-superficie: #111a2c;
+    --sge-superficie-2: #16213a;
+    --sge-borda: #24324d;
+    --sge-texto: #f1f5f9;
+    --sge-texto-2: #cbd5e1;
+    --sge-texto-3: #94a3b8;
+}
+
+/* ── Base (só vale dentro de .sge, para não quebrar sistemas antigos) ── */
+.sge {
+    font-family: var(--sge-fonte);
+    color: var(--sge-texto);
+    background: var(--sge-fundo);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+.sge *, .sge *::before, .sge *::after { box-sizing: border-box; }
+.sge :focus-visible { outline: 3px solid var(--sge-destaque); outline-offset: 2px; }
+
+/* ── Botões ───────────────────────────────────────────── */
+.sge-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: var(--sge-toque); padding: 0 18px;
+    font: 600 15px/1 var(--sge-fonte);
+    color: #fff; background: var(--sge-destaque);
+    border: 1px solid transparent; border-radius: var(--sge-raio-pequeno);
+    cursor: pointer; transition: background .15s, opacity .15s;
+}
+.sge-btn:hover { background: var(--sge-destaque-hover); }
+.sge-btn:disabled { opacity: .5; cursor: not-allowed; }
+.sge-btn--secundario { color: var(--sge-texto); background: var(--sge-superficie); border-color: var(--sge-borda); }
+.sge-btn--secundario:hover { background: var(--sge-superficie-2); }
+.sge-btn--perigo { background: var(--sge-perigo); }
+.sge-btn--perigo:hover { background: var(--sge-perigo); opacity: .88; }
+.sge-btn--bloco { width: 100%; }
+
+/* ── Cartão ───────────────────────────────────────────── */
+.sge-cartao {
+    background: var(--sge-superficie);
+    border: 1px solid var(--sge-borda);
+    border-radius: var(--sge-raio);
+    box-shadow: var(--sge-sombra);
+    padding: 16px;
+}
+@media (min-width: 768px) { .sge-cartao { padding: 24px; } }
+
+/* ── Campos de formulário ─────────────────────────────── */
+.sge-campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.sge-campo label { font-size: 14px; font-weight: 600; color: var(--sge-texto-2); }
+.sge-input, .sge-select, .sge-textarea {
+    min-height: var(--sge-toque); width: 100%; padding: 10px 12px;
+    font: 16px var(--sge-fonte);  /* 16px evita zoom automático no celular */
+    color: var(--sge-texto); background: var(--sge-superficie);
+    border: 1px solid var(--sge-borda); border-radius: var(--sge-raio-pequeno);
+}
+.sge-input:focus, .sge-select:focus, .sge-textarea:focus {
+    outline: none; border-color: var(--sge-destaque); box-shadow: 0 0 0 3px var(--sge-destaque-suave);
+}
+
+/* ── Tabela (rola de lado no celular) ─────────────────── */
+.sge-tabela-caixa { overflow-x: auto; border: 1px solid var(--sge-borda); border-radius: var(--sge-raio); }
+.sge-tabela { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--sge-superficie); }
+.sge-tabela th { text-align: left; font-weight: 600; color: var(--sge-texto-2); background: var(--sge-superficie-2); }
+.sge-tabela th, .sge-tabela td { padding: 10px 12px; border-bottom: 1px solid var(--sge-borda); white-space: nowrap; }
+.sge-tabela tbody tr:hover { background: var(--sge-destaque-suave); }
+
+/* ── Avisos (toast) ───────────────────────────────────── */
+.sge-avisos {
+    position: fixed; z-index: 2147483000; left: 50%; bottom: 16px; transform: translateX(-50%);
+    display: flex; flex-direction: column; gap: 8px; width: min(92vw, 420px); pointer-events: none;
+}
+.sge-aviso {
+    pointer-events: auto; display: flex; gap: 10px; align-items: flex-start;
+    padding: 12px 14px; border-radius: var(--sge-raio-pequeno);
+    font: 500 14px/1.45 var(--sge-fonte); color: #fff; background: #1f2937;
+    box-shadow: var(--sge-sombra-forte); border-left: 4px solid var(--sge-info);
+    animation: sge-entrar .2s ease-out;
+}
+.sge-aviso--sucesso { border-left-color: #22c55e; }
+.sge-aviso--alerta  { border-left-color: #f59e0b; }
+.sge-aviso--erro    { border-left-color: #ef4444; }
+.sge-aviso button { margin-left: auto; background: none; border: 0; color: #cbd5e1; font-size: 18px; line-height: 1; cursor: pointer; }
+@keyframes sge-entrar { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ── Carregando ───────────────────────────────────────── */
+.sge-carregando {
+    position: fixed; inset: 0; z-index: 2147482000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: rgba(15, 23, 42, .45); color: #fff; font: 500 15px var(--sge-fonte);
+}
+.sge-roda {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, .3); border-top-color: #fff;
+    animation: sge-girar .8s linear infinite;
+}
+@keyframes sge-girar { to { transform: rotate(360deg); } }
+
+/* ── Faixa "sem internet" ─────────────────────────────── */
+.sge-offline {
+    position: fixed; z-index: 2147483001; top: 0; left: 0; right: 0;
+    padding: 8px 12px; text-align: center;
+    font: 600 14px var(--sge-fonte); color: #fff; background: var(--sge-alerta);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sge-aviso, .sge-roda { animation: none; }
+}
