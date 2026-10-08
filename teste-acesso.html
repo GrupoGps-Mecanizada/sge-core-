@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR" class="sge-acesso-pendente">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SGE Core · teste do acesso</title>
+    <link rel="icon" href="v1/assets/sge-logo.svg">
+    <link rel="stylesheet" href="v1/sge-core.css">
+    <style>
+        body { margin: 0; }
+        main { max-width: 640px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+        h1 { font-size: 18px; margin: 0; }
+        dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; margin: 0; }
+        dt { font-weight: 600; }
+        dd { margin: 0; word-break: break-word; }
+    </style>
+</head>
+<body class="sge">
+    <main>
+        <h1>Teste do SGE.acesso (login da Central)</h1>
+
+        <section class="sge-cartao">
+            <dl>
+                <dt>Nome</dt><dd id="nome"></dd>
+                <dt>E-mail</dt><dd id="email"></dd>
+                <dt>Papel</dt><dd id="papel"></dd>
+                <dt>Telas</dt><dd id="telas"></dd>
+                <dt>Admin da Central</dt><dd id="admin"></dd>
+            </dl>
+        </section>
+
+        <section class="sge-cartao">
+            <p data-sge-papel="ADMIN">Você vê esta linha porque é ADMIN.</p>
+            <p data-sge-papel="LEITURA">Você vê esta linha porque é LEITURA.</p>
+            <p data-sge-tela="tela-que-ninguem-tem">Esta linha só aparece para quem tem todas as telas liberadas.</p>
+        </section>
+
+        <div>
+            <button class="sge-btn sge-btn--secundario" type="button" onclick="SGE.acesso.reconferir().then((r) => SGE.aviso('Conferência: ' + r, 'info'))">Conferir agora</button>
+            <button class="sge-btn" type="button" onclick="SGE.acesso.sair()">Sair</button>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+    <script src="v1/sge-core.js"></script>
+    <script>
+        // sge_hub = a própria Central (só quem tem acesso a ela entra aqui).
+        SGE.acesso.entrar('sge_hub').then(({ usuario, papel, permissoes }) => {
+            const por = (id, v) => { document.getElementById(id).textContent = v; };
+            por('nome', usuario.nome);
+            por('email', usuario.email);
+            por('papel', papel);
+            por('telas', permissoes.telas == null ? 'todas' : permissoes.telas.join(', ') || 'nenhuma');
+            por('admin', permissoes.admin_central ? 'sim' : 'não');
+        });
+    </script>
+</body>
+</html>

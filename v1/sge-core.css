@@ -161,6 +161,9 @@
 }
 @keyframes sge-girar { to { transform: rotate(360deg); } }
 
+/* ── Acesso: <html class="sge-acesso-pendente"> esconde a página até o SGE.acesso conferir ── */
+html.sge-acesso-pendente body > *:not(.sge-carregando):not(.sge-avisos):not(.sge-offline) { visibility: hidden !important; }
+
 /* ── Faixa "sem internet" ─────────────────────────────── */
 .sge-offline {
     position: fixed; z-index: 2147483001; top: 0; left: 0; right: 0;
