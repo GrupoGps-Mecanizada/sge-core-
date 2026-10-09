@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teste da Barra SGE</title>
+    <link rel="stylesheet" href="v1/sge-core.css">
+    <style>body { margin: 0; } main { max-width: 900px; margin: 0 auto; padding: 32px 16px; } a.estrago { color: red; } * { letter-spacing: .02em; }</style>
+</head>
+<body class="sge">
+    <main>
+        <h1>Teste da Barra Universal</h1>
+        <p>Dados de exemplo, sem conexão real. A página tem CSS "estragado" de propósito (links vermelhos): a barra não pode mudar.</p>
+        <p><a class="estrago" href="#">link do sistema</a></p>
+    </main>
+    <script>
+        // Supabase falso só para ver a barra (nenhum dado real).
+        var exemplos = [
+            ['sst', 'SST', 'hard-hat', '#15803d', 'Segurança'], ['etilometro', 'Etilômetro Digital', 'shield', '#ea580c', 'Segurança'],
+            ['efetivo', 'Gestão de Efetivo', 'users', '#1d4ed8', 'Pessoal'], ['presenca', 'Controle de Presença', 'check-circle', '#7c3aed', 'Pessoal'],
+            ['horas', 'Horas Extras', 'clock', '#be185d', 'Pessoal'], ['turno', 'Relatório de Turno', 'clipboard', '#059669', 'Operação'],
+            ['apont', 'Apontamentos', 'tablet', '#d97706', 'Operação'], ['medicao', 'Controle de Medição', 'ruler', '#dc2626', 'Operação'],
+            ['manut', 'Manutenções', 'wrench', '#6366f1', 'Operação'], ['almox', 'Almoxarifado', 'box', '#0891b2', 'Operação'],
+            ['frota', 'Controle de Frota com um nome bem comprido para testar', 'truck', '#65a30d', 'Frota'], ['central', 'SGE Central', 'default', '#1d4ed8', 'Administração'],
+        ].map(function (s, i) { return { slug: s[0], nome: s[1], icone: s[2], cor: s[3], area_menu: s[4], ordem: i, url_origem: '#' + s[0], abre_fora: s[0] === 'central' }; });
+        var cliente = {
+            auth: {
+                getSession: async function () { return { data: { session: { user: { email: 'pessoa.exemplo@gestaogps.com.br', user_metadata: { nome: 'Pessoa Exemplo' } } } }, error: null }; },
+                signOut: async function () { return { error: null }; },
+                onAuthStateChange: function () { return {}; },
+            },
+            rpc: async function () { await new Promise(function (r) { setTimeout(r, 600); }); return { data: { ativo: true, sistemas: exemplos }, error: null }; },
+            schema: function () { return cliente; },
+        };
+        window.supabase = { createClient: function () { return cliente; } };
+    </script>
+    <script src="v1/sge-core.js"></script>
+    <script src="v1/sge-icones.js"></script>
+    <script src="v1/sge-barra.js"></script>
+    <script>
+        var barra = SGE.barra.montar({
+            sistema: 'sst', nome: 'SST', area: 'Mecanizada', inicio: '#inicio',
+            secoes: [
+                { rotulo: 'Início', icone: 'home', href: '#inicio' },
+                { rotulo: 'Colaboradores', icone: 'users', texto: 'Consultar e cadastrar pessoas', itens: [
+                    { rotulo: 'Matriz', texto: 'Quem tem cada requisito', href: '#matriz', icone: 'clipboard-check', grupo: 'Consultas' },
+                    { rotulo: 'Novo colaborador', texto: 'Cadastrar uma pessoa', href: '#novo', icone: 'user', grupo: 'Cadastro' } ] },
+                { rotulo: 'Acompanhamento', icone: 'activity', texto: 'O que precisa de atenção', itens: [
+                    { rotulo: 'Pendências', texto: 'Abertas e aguardando aprovação', href: '#pendencias', icone: 'alert', grupo: 'Hoje' } ] },
+                { rotulo: 'Configurações', icone: 'settings', texto: 'Regras do sistema e auditoria', itens: [
+                    { rotulo: 'Auditoria', texto: 'Quem mudou o quê', href: '#auditoria', icone: 'file-text', grupo: 'Sistema' } ] },
+            ],
+            atual: function () { return location.hash || '#inicio'; },
+            aoBuscar: function () { SGE.aviso('Aqui abre a busca do próprio sistema.', 'info'); },
+            aoSair: function () { SGE.aviso('Sair (só teste).', 'info'); },
+        });
+        barra.contador('#pendencias', 280);
+        // Para a foto de conferência: teste-barra.html?abrir=grade (ou secao-1, usuario, gaveta)
+        var abrir = new URLSearchParams(location.search).get('abrir');
+        if (abrir) setTimeout(function () { barra.abrir(abrir); }, 50);
+    </script>
+</body>
+</html>

@@ -66,6 +66,33 @@ Ao migrar um sistema (Fase 5): tirar o `sso_client.js` e o `sge-session-ping.js`
 
 Também fica em `window.SGECore`. Se o sistema já tiver um `window.SGE` próprio, o núcleo só acrescenta o que falta e não apaga nada.
 
+## Barra universal (v1.2)
+A mesma barra de topo em todos os sistemas: logo SGE (abre a grade com os sistemas da pessoa), menus do sistema, busca Ctrl+K, tema e usuário.
+```html
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/sge-core-/v1/sge-core.js"></script>
+<script src="/sge-core-/v1/sge-icones.js"></script>
+<script src="/sge-core-/v1/sge-barra.js"></script>
+<script>
+  const barra = SGE.barra.montar({
+    sistema: 'gestao_efetivo_mec', nome: 'Gestão de Efetivo', area: 'Mecanizada', inicio: '/Gest-o-Efetivo/',
+    secoes: [
+      { rotulo: 'Início', icone: 'home', href: '/Gest-o-Efetivo/' },
+      { rotulo: 'Equipes', icone: 'users', texto: 'Quem está em cada equipe', itens: [
+        { rotulo: 'Quadro', texto: 'Equipes do dia', href: '/Gest-o-Efetivo/quadro', icone: 'clipboard', grupo: 'Consultas', tela: 'quadro' } ] },
+    ],
+    // aoBuscar: () => abrirMinhaBusca(),   // opcional: Ctrl+K abre a busca do sistema
+    // aoNavegar: (href) => router.push(href), // opcional: sistemas que trocam de tela sem recarregar
+  });
+  await SGE.acesso.entrar('gestao_efetivo_mec');
+  barra.atualizar(); // depois do login: esconde o que a pessoa não pode ver e mostra o nome dela
+</script>
+```
+- `tela` no item = só aparece para quem tem essa tela liberada. `barra.contador(href, n)` põe um número ao lado (0 esconde).
+- O visual fica isolado (Shadow DOM): o CSS do sistema não estraga a barra. Deixe o `<body>` sem margem (`margin: 0`) para a barra encostar nas bordas.
+- Ícones: `SGE.icone('truck', 20)` e a lista em `SGE.icones`. Ícone e cor de cada sistema vêm da tela de Sistemas da Central.
+- Teste visual: `teste-barra.html` (dados de exemplo; `?abrir=grade` abre a grade).
+
 ## Versões
 - A pasta `v1/` nunca recebe mudança que quebre os sistemas. Mudança grande vai para uma pasta `v2/`.
 - Veja o `CHANGELOG.md`.

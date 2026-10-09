@@ -21,9 +21,9 @@ Sucesso = o SST e o portal usam a mesma barra; um sistema novo ganha a barra com
 ## 3. Peças (sge-core v1.2.0)
 | Arquivo | Faz | Depende de |
 |---|---|---|
-| `v1/sge-icones.js` | `SGE.icones` (nome → desenho SVG) e `SGE.icone(nome, tamanho)` → elemento `<svg>`. ~35 ícones de linha (Lucide, licença ISC, livre; aviso de licença no arquivo). Nome desconhecido → `grade`. | nada |
+| `v1/sge-icones.js` | `SGE.icones` (lista dos nomes) e `SGE.icone(nome, tamanho)` → elemento `<svg>`. ~35 ícones de linha (Lucide, licença ISC, livre; aviso de licença no arquivo). Nome desconhecido → `grade`. | nada |
 | `v1/sge-barra.js` | Componente `<sge-barra>` + `SGE.barra.montar(opcoes)`. | `sge-core.js`, `sge-icones.js`, supabase-js |
-| `sge-core.js` | Só a versão sobe para 1.2.0 (sem mudança de comportamento). | — |
+| `sge-core.js` | Versão 1.2.0 e `SGE.acesso.conexao()` (a conexão da Central, usada pela barra). | — |
 
 Ordem na página: supabase-js → `sge-core.js` → `sge-icones.js` → `sge-barra.js`.
 Os arquivos ficam separados para quem não usa a barra não carregar nada a mais (o `sge-core.js` já tem ~720 linhas).

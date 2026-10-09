@@ -71,8 +71,10 @@
             .filter((s) => s.endereco && (!t || semAcento(s.nome + ' ' + (s.area_menu || '')).includes(t)));
     }
 
+    // Endereço por caminho (/sst/matriz) ou por "#" (#matriz, em sistemas que trocam de tela pelo #).
     function bate(href, caminho) {
-        const h = String(href).split(/[?#]/)[0];
+        href = String(href);
+        const h = href.charAt(0) === '#' ? href : href.split(/[?#]/)[0];
         return caminho === h || caminho.startsWith(h.endsWith('/') ? h : h + '/');
     }
 

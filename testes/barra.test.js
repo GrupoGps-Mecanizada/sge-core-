@@ -34,6 +34,10 @@ test('regras: endereço, cor, tela ativa, iniciais', () => {
     assert.equal(r.telaAtual(secoes, '/sst/matriz/123'), '/sst/matriz');
     assert.equal(r.telaAtual(secoes, '/sst/outra'), '/sst/');
     assert.equal(r.telaAtual(secoes, '/gestao/'), null);
+    const porHash = [{ href: '#inicio' }, { itens: [{ href: '#matriz' }, { href: '/sst/?aba=2' }] }];
+    assert.equal(r.telaAtual(porHash, '#matriz'), '#matriz');
+    assert.equal(r.telaAtual(porHash, '#inicio'), '#inicio');
+    assert.equal(r.telaAtual(porHash, '/sst/'), '/sst/?aba=2');
     assert.equal(r.iniciais('Maria Teste'), 'MT');
     assert.equal(r.iniciais('warlison@sge.com'), 'WA');
     assert.equal(r.iniciais(''), '?');
