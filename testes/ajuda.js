@@ -3,7 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const { JSDOM } = require('jsdom');
 
-const CODIGO = fs.readFileSync(path.join(__dirname, '..', 'v1', 'sge-core.js'), 'utf8');
+const ler = (nome) => fs.readFileSync(path.join(__dirname, '..', 'v1', nome), 'utf8');
+const CODIGO = ler('sge-core.js');
 
 const PERM_OK = {
     usuario_id: 'u-1', nome: 'Maria Teste', email: 'maria@gestaogps.com.br',
@@ -28,7 +29,11 @@ function supabaseFalso(cfg = {}) {
             signOut: async (o) => { chamadas.signOut.push(o); return { error: null }; },
         },
         schema() { return cliente; },
-        rpc: async (nome, args) => { chamadas.rpc.push([nome, args]); return resp(cfg.perm, { data: PERM_OK, error: null }); },
+        rpc: async (nome, args) => {
+            chamadas.rpc.push([nome, args]);
+            if (nome === 'sge_meus_sistemas') return resp(cfg.sistemas, { data: { ativo: true, nome: 'Maria Teste', sistemas: [] }, error: null });
+            return resp(cfg.perm, { data: PERM_OK, error: null });
+        },
         from: (tabela) => {
             chamadas.from.push(tabela);
             const q = { select: () => q, eq: () => q, limit: async () => resp(cfg.manut, { data: [], error: null }) };
@@ -53,7 +58,7 @@ function supabaseFalso(cfg = {}) {
     };
 }
 
-function montar({ url = 'https://grupogps-mecanizada.github.io/gestao/', html = '', supa, antes } = {}) {
+function montar({ url = 'https://grupogps-mecanizada.github.io/gestao/', html = '', supa, antes, extras = [] } = {}) {
     const dom = new JSDOM(`<!doctype html><html><head></head><body>${html}</body></html>`, {
         url, runScripts: 'outside-only', pretendToBeVisual: true,
     });
@@ -61,6 +66,7 @@ function montar({ url = 'https://grupogps-mecanizada.github.io/gestao/', html = 
     if (supa) w.supabase = { createClient: supa.createClient };
     if (antes) antes(w);
     w.eval(CODIGO);
+    extras.forEach((nome) => w.eval(ler(nome)));
     const idas = [];
     if (w.SGE && w.SGE.acesso) w.SGE.acesso._ir = (u) => idas.push(u);
     return { w, idas, fechar: () => w.close() };

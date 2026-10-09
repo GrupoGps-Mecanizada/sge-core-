@@ -15,6 +15,7 @@
  *   SGE.logo(variante)         → endereço do logo oficial
  *   SGE.acesso                 → login único da Central + permissões do sistema (v1.1):
  *                                await SGE.acesso.entrar('slug_do_sistema')
+ *   SGE.barra / SGE.icone        → barra de topo universal e ícones (v1.2): arquivos sge-barra.js e sge-icones.js
  *
  * Sistemas que ainda usam sso_client.js + sge-session-ping.js continuam iguais:
  * o SGE.acesso só age quando o sistema chama SGE.acesso.entrar().
@@ -24,7 +25,7 @@
 
     if (window.SGECore) return; // já carregado
 
-    const VERSAO = '1.1.1';
+    const VERSAO = '1.2.0';
 
     // A Central fica no mesmo endereço em que o sistema está aberto (portal ou github.io),
     // para a sessão do Supabase ser a mesma. Testes locais usam SGE_CENTRAL_URL_OVERRIDE.
@@ -692,6 +693,7 @@
         sair,
         irParaLogin: (slug) => _irParaLogin(slug),
         tipoDeErro,
+        conexao: () => cliente(ACESSO.url, ACESSO.chave), // conexão da Central (usada pela barra)
         get central() { return ACESSO.central; },
         get usuario() { return _acesso.perm ? Object.assign({}, _acesso.usuario) : null; },
         get papel() { return _acesso.perm ? _acesso.perm.papel : null; },

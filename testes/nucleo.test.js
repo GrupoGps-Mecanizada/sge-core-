@@ -8,10 +8,10 @@ function jwtFalso(role) {
     return 'eyJhbGciOiJIUzI1NiJ9.' + corpo + '.assinatura';
 }
 
-test('carrega a versão 1.1.1 em SGE e SGECore', () => {
+test('carrega a versão 1.2.0 em SGE e SGECore', () => {
     const { w, fechar } = montar();
-    assert.equal(w.SGE.versao, '1.1.1');
-    assert.equal(w.SGECore.versao, '1.1.1');
+    assert.equal(w.SGE.versao, '1.2.0');
+    assert.equal(w.SGECore.versao, '1.2.0');
     assert.equal(typeof w.SGE.acesso.entrar, 'function');
     fechar();
 });
