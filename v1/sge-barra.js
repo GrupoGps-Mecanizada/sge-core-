@@ -116,6 +116,7 @@
     }
 
     const icone = (nome, tamanho) => (window.SGE.icone ? window.SGE.icone(nome, tamanho) : null);
+    const iconeCheio = (nome, tamanho) => (window.SGE.iconeCheio ? window.SGE.iconeCheio(nome, tamanho) : icone(nome, tamanho));
 
     function pode(tela) {
         const a = core.acesso;
@@ -168,6 +169,19 @@ p { margin: 0; }
 .barra { display: flex; align-items: center; gap: 12px; height: 62px; padding: 0 20px; background: var(--sge-marca-escura, #0d1b2e); color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,.08); box-shadow: 0 6px 16px -8px rgba(0,0,0,.5); transition: background .25s, box-shadow .25s, border-color .25s; }
 :host(.transparente) { position: fixed; top: 0; left: 0; right: 0; }
 .barra.vidro { background: transparent; border-bottom-color: transparent; box-shadow: none; }
+.barra.clara { background: rgba(255,255,255,.78); color: #0f172a; border-bottom-color: rgba(15,23,42,.07); box-shadow: none; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.barra.clara .nome strong { color: #0f172a; }
+.barra.clara .nome .sub, .barra.clara .nome .tela { color: #64748b; }
+.barra.clara .logo { box-shadow: 0 0 0 1px rgba(15,23,42,.08); }
+.barra.clara .busca, .barra.clara .redondo { border-color: rgba(15,23,42,.1); background: #ffffff; color: #475569; }
+.barra.clara .busca:hover, .barra.clara .redondo:hover { background: #f8fafc; color: #0f172a; }
+.barra.clara .busca kbd { border-color: rgba(15,23,42,.12); background: #f1f5f9; }
+.barra.clara .menu { border-color: rgba(15,23,42,.06); background: rgba(15,23,42,.02); }
+.barra.clara .botao-menu { color: #475569; }
+.barra.clara .botao-menu:hover { background: rgba(15,23,42,.05); color: #0f172a; }
+.barra.clara .botao-menu.ativo, .barra.clara .botao-menu[aria-expanded="true"] { background: rgba(15,23,42,.07); color: #0f172a; box-shadow: none; }
+.barra.clara .divisor { background: rgba(15,23,42,.1); }
+.barra.clara .avatar { box-shadow: 0 0 0 2px rgba(15,23,42,.08); }
 .barra.fosco { background: rgba(13,27,46,.82); -webkit-backdrop-filter: saturate(140%) blur(12px); backdrop-filter: saturate(140%) blur(12px); }
 .caixa { position: relative; display: flex; align-items: center; }
 .logo { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .15s, box-shadow .15s; }
@@ -214,9 +228,9 @@ p { margin: 0; }
 .ladrilhos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
 .ladrilho { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 4px 10px; border-radius: 10px; text-align: center; }
 .ladrilho:hover { background: var(--sge-superficie-2, #f5f7fb); }
-.quadrado { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; color: var(--sge-texto-2, #4b5563); background: var(--sge-superficie-2, #f5f7fb); border: 1px solid var(--sge-borda, #e1e6ef); transition: transform .15s, color .15s, border-color .15s; }
-.ladrilho:hover .quadrado { transform: translateY(-2px); color: var(--sge-destaque, #1d4ed8); border-color: var(--sge-destaque, #1d4ed8); }
-.ladrilho[aria-current="page"] .quadrado { color: var(--sge-destaque, #1d4ed8); border-color: var(--sge-destaque, #1d4ed8); background: var(--sge-destaque-suave, #1d4ed814); }
+.quadrado { display: grid; place-items: center; width: 52px; height: 44px; color: #4a7bc8; filter: drop-shadow(0 4px 8px rgba(74,123,200,.22)); transition: transform .15s, color .15s; }
+.ladrilho:hover .quadrado { transform: translateY(-2px); color: var(--sge-marca, #1b3a6b); }
+.ladrilho[aria-current="page"] .quadrado { color: var(--sge-marca, #1b3a6b); }
 .nome-sis { font-size: 12.5px; line-height: 1.25; color: var(--sge-texto, #111827); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .fora { position: absolute; top: 6px; right: 8px; color: var(--sge-texto-3, #6b7280); }
 .fantasma { height: 86px; border-radius: 10px; background: var(--sge-superficie-2, #f5f7fb); animation: piscar 1.2s ease-in-out infinite; }
@@ -357,7 +371,7 @@ p { margin: 0; }
         }
 
         function ladrilho(s) {
-            const quadrado = el('span', { classe: 'quadrado' }, [icone(s.icone, 24)]);
+            const quadrado = el('span', { classe: 'quadrado' }, [iconeCheio(s.icone, 32)]);
             return el('a', {
                 classe: 'ladrilho', href: s.endereco, title: s.nome,
                 target: s.abre_fora ? '_blank' : null, rel: s.abre_fora ? 'noopener' : null,
@@ -480,7 +494,7 @@ p { margin: 0; }
             visiveis.forEach((s) => [s].concat(s.itens || []).forEach((i) => { if (i.href === atual) rotuloAtual = i.rotulo; }));
             host.classList.toggle('transparente', !!op.transparente);
             const vidro = op.transparente ? (est.rolou ? ' fosco' : ' vidro') : '';
-            const barra = el('header', { classe: 'barra' + vidro }, [
+            const barra = el('header', { classe: 'barra' + vidro + (op.clara ? ' clara' : '') }, [
                 el('div', { classe: 'caixa' }, [
                     el('button', { type: 'button', classe: 'logo', 'data-chave': 'grade', 'aria-haspopup': 'dialog',
                         'aria-expanded': String(est.aberto === 'grade'), 'aria-label': 'Sistemas do SGE', title: 'Sistemas do SGE',
@@ -639,7 +653,7 @@ p { margin: 0; }
     }
 
     SGE.barra = {
-        versao: '1.3.0',
+        versao: '1.4.0',
         // Portal SGE na página de cima (mesmo endereço); fora dele, ou em outro endereço, devolve null.
         _acharPortal() {
             try { return window.top !== window && window.top.SGEPortal ? window.top.SGEPortal : null; } catch (_) { return null; }

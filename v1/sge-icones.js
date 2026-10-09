@@ -1,7 +1,8 @@
 /**
  * SGE ÍCONES v1 — ícones de linha dos sistemas e da barra do SGE (sge-core 1.2).
  * Desenhos do Lucide (https://lucide.dev) — licença ISC, Copyright (c) Lucide Contributors.
- * Uso: SGE.icone('truck', 20) → <svg> pronto para pôr na página. Lista: SGE.icones.
+ * Uso: SGE.icone('truck', 20) → <svg> de linha; SGE.iconeCheio('truck', 20) → <svg> preenchido (cor do texto).
+ * Lista: SGE.icones.
  */
 (function () {
     'use strict';
@@ -47,6 +48,20 @@
         fechar: ['M18 6 6 18', 'm6 6 12 12'],
         'abrir-fora': ['M15 3h6v6', 'M10 14 21 3', 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'],
     };
+    // Versões preenchidas (desenho cheio; detalhes vazados com evenodd) dos ícones de sistema.
+    const CHEIOS = {
+        grade: 'M5 3h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM16 3h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM5 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2zM16 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2z',
+        truck: 'M3 5h10a1 1 0 0 1 1 1v9H2V6a1 1 0 0 1 1-1zM15 8.5h3.6a1 1 0 0 1 .8.4l2.4 3.2a1 1 0 0 1 .2.6V15h-7zM4.6 18a2.4 2.4 0 1 0 4.8 0a2.4 2.4 0 1 0-4.8 0zM6 18a1 1 0 1 0 2 0a1 1 0 1 0-2 0zM15.1 18a2.4 2.4 0 1 0 4.8 0a2.4 2.4 0 1 0-4.8 0zM16.5 18a1 1 0 1 0 2 0a1 1 0 1 0-2 0z',
+        clipboard: 'M6 4h2.2a2 2 0 0 0 1.8 1h4a2 2 0 0 0 1.8-1H18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM10 2h4a1 1 0 0 1 1 1v.8a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM8 10.5h8v1.6H8zM8 14.5h5.5v1.6H8z',
+        tablet: 'M7 2h10a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3zM6.5 4.5h11v12.5h-11zM11.1 19.3a.9.9 0 1 0 1.8 0a.9.9 0 1 0-1.8 0z',
+        ruler: 'M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0ZM14.65 11.5a.85.85 0 1 0 1.7 0a.85.85 0 1 0-1.7 0zM11.65 8.5a.85.85 0 1 0 1.7 0a.85.85 0 1 0-1.7 0zM8.65 5.5a.85.85 0 1 0 1.7 0a.85.85 0 1 0-1.7 0zM17.65 14.5a.85.85 0 1 0 1.7 0a.85.85 0 1 0-1.7 0z',
+        wrench: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
+        box: 'M12 2.6l8.2 4.6L12 11.8 3.8 7.2zM3 8.9l8.2 4.6v8.6L3 17.5zM21 8.9v8.6l-8.2 4.6v-8.6z',
+        users: 'M5.4 7a3.6 3.6 0 1 0 7.2 0a3.6 3.6 0 1 0-7.2 0zM2 20a7 7 0 0 1 14 0v1H2zM14.5 7.5a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0-5.6 0zM17.3 13.4a5.3 5.3 0 0 1 4.7 5.3V21h-4.2v-1a8.6 8.6 0 0 0-2.2-6a5 5 0 0 1 1.7-.6z',
+        'check-circle': 'M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0zM7.4 12.4l1.4-1.4 2.1 2.1 4.8-4.8 1.4 1.4-6.2 6.2z',
+        clock: 'M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0zM11 6h2v5.4l3.7 2.1-1 1.7-4.7-2.7z',
+        shield: 'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1zM8.4 12.1l1.4-1.4 1.6 1.6 3.3-3.3 1.4 1.4-4.7 4.7z',
+    };
     const APELIDOS = { default: 'grade', 'layout-grid': 'grade', package: 'box', 'bar-chart': 'chart', house: 'home', 'log-out': 'sair', x: 'fechar', 'external-link': 'abrir-fora' };
 
     function nomeReal(nome) {
@@ -79,8 +94,24 @@
         return svg;
     }
 
+    // Preenchido (cor do texto). Sem versão cheia, devolve o de linha.
+    function iconeCheio(nome, tamanho, doc) {
+        doc = doc || document;
+        const n = nomeReal(nome);
+        if (!Object.prototype.hasOwnProperty.call(CHEIOS, n)) return icone(nome, tamanho, doc);
+        const t = String(tamanho || 20);
+        const svg = doc.createElementNS(NS, 'svg');
+        [['viewBox', '0 0 24 24'], ['width', t], ['height', t], ['fill', 'currentColor'], ['fill-rule', 'evenodd'],
+            ['aria-hidden', 'true'], ['focusable', 'false'], ['data-icone', n]].forEach(([k, v]) => svg.setAttribute(k, v));
+        const peca = doc.createElementNS(NS, 'path');
+        peca.setAttribute('d', CHEIOS[n]);
+        svg.appendChild(peca);
+        return svg;
+    }
+
     const caixa = (window.SGE = window.SGE || {});
     caixa.icone = icone;
+    caixa.iconeCheio = iconeCheio;
     caixa.icones = Object.freeze(Object.keys(ICONES).sort());
-    if (window.SGECore) { window.SGECore.icone = icone; window.SGECore.icones = caixa.icones; }
+    if (window.SGECore) { window.SGECore.icone = icone; window.SGECore.iconeCheio = iconeCheio; window.SGECore.icones = caixa.icones; }
 })();

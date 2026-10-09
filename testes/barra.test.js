@@ -426,3 +426,39 @@ test('dentro do portal sem sessão: Entrar chama o portal', async () => {
     assert.equal(t.idas.length, 0);
     t.fechar();
 });
+
+// ── v1.4: ícones preenchidos e barra clara ───────────────
+
+test('ícone preenchido: desenho cheio na cor do texto; sem versão cheia, usa o de linha', () => {
+    const { w, fechar } = montar({ extras: ['sge-icones.js'] });
+    const cheio = w.SGE.iconeCheio('truck', 30);
+    assert.equal(cheio.getAttribute('data-icone'), 'truck');
+    assert.equal(cheio.getAttribute('fill'), 'currentColor');
+    assert.equal(cheio.getAttribute('fill-rule'), 'evenodd');
+    assert.equal(cheio.getAttribute('width'), '30');
+    assert.equal(w.SGE.iconeCheio('default').getAttribute('data-icone'), 'grade');
+    assert.equal(w.SGE.iconeCheio('default').getAttribute('fill'), 'currentColor');
+    const linha = w.SGE.iconeCheio('hard-hat');
+    assert.equal(linha.getAttribute('data-icone'), 'hard-hat');
+    assert.equal(linha.getAttribute('stroke'), 'currentColor');
+    ['truck', 'clipboard', 'tablet', 'ruler', 'wrench', 'box', 'users', 'check-circle', 'clock', 'shield']
+        .forEach((n) => assert.equal(w.SGE.iconeCheio(n).getAttribute('fill'), 'currentColor', n));
+    fechar();
+});
+
+test('barra clara: para páginas de fundo claro', async () => {
+    const t = await abrir({ opcoes: { clara: true } });
+    assert.ok(t.$('.barra').classList.contains('clara'));
+    t.barra.atualizar({ clara: false });
+    assert.ok(!t.$('.barra').classList.contains('clara'));
+    t.fechar();
+});
+
+test('grade da barra usa os ícones preenchidos', async () => {
+    const t = await abrir();
+    t.$('[data-chave="grade"]').click(); await pausa(5);
+    const svg = t.$$('.ladrilho')[0].querySelector('.quadrado svg');
+    assert.equal(svg.getAttribute('fill'), 'currentColor');
+    assert.equal(svg.getAttribute('data-icone'), 'users');
+    t.fechar();
+});

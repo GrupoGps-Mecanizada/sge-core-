@@ -1,5 +1,9 @@
 # Mudanças do SGE Core
 
+## v1.4.0 · 2026-10-09
+- `SGE.iconeCheio(nome, tamanho)`: ícones preenchidos (desenho cheio, detalhes vazados) para os sistemas; sem versão cheia, usa o de linha.
+- Barra: opção `clara` (para páginas de fundo claro, como o Portal SGE) e grade de sistemas com os ícones preenchidos no azul claro do SGE (#4A7BC8). Testes: 72.
+
 ## v1.3.0 · 2026-10-09
 - Barra Universal pronta para o Portal SGE: `transparente` (fixa no topo, ganha fundo ao rolar), `aoAbrirSistema(slug)`, `aoIrInicio()` e `aoEntrar()`.
 - Dentro do portal, a barra se registra (`SGEPortal.registrarBarra`) para o portal esconder a barra dele, e trocar de sistema, voltar ao início, sair e entrar passam pelo portal. Testes: 69.
