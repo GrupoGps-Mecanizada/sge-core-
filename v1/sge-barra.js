@@ -126,14 +126,26 @@
         return !(a && a.permissoes) || a.pode(tela);
     }
 
-    function lerCache() {
+    // Lista guardada por usuário: num computador compartilhado, uma pessoa nunca vê a lista da outra.
+    function lerCache(id) {
+        if (!id) return null;
         try {
-            const c = JSON.parse(sessionStorage.getItem(CHAVE_CACHE));
+            const c = JSON.parse(sessionStorage.getItem(CHAVE_CACHE + ':' + id));
             return c && Array.isArray(c.lista) && Date.now() - c.em < CACHE_MS ? c.lista : null;
         } catch (_) { return null; }
     }
-    function guardarCache(lista) {
-        try { sessionStorage.setItem(CHAVE_CACHE, JSON.stringify({ em: Date.now(), lista })); } catch (_) { /* sem sessionStorage: consulta de novo */ }
+    function guardarCache(id, lista) {
+        if (!id) return;
+        try { sessionStorage.setItem(CHAVE_CACHE + ':' + id, JSON.stringify({ em: Date.now(), lista })); } catch (_) { /* sem sessionStorage: consulta de novo */ }
+    }
+
+    function limparCache() {
+        try {
+            for (let i = sessionStorage.length - 1; i >= 0; i--) {
+                const k = sessionStorage.key(i);
+                if (k && (k === CHAVE_CACHE || k.indexOf(CHAVE_CACHE + ':') === 0)) sessionStorage.removeItem(k);
+            }
+        } catch (_) { /* nada guardado */ }
     }
 
     function temaEscuro() {
@@ -154,6 +166,8 @@
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; margin: 0; padding: 0; cursor: pointer; }
 p { margin: 0; }
+.barra, .gaveta { font-family: var(--sge-fonte, 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif); font-size: 14px; font-weight: 400; font-style: normal; line-height: normal; letter-spacing: normal; word-spacing: normal; text-transform: none; text-align: left; text-indent: 0; white-space: normal; }
+.sem-animacao { animation: none !important; }
 :focus-visible { outline: 2px solid #f59e0b; outline-offset: 2px; }
 .barra { display: flex; align-items: center; gap: 12px; height: 62px; padding: 0 20px; background: var(--sge-marca-escura, #0d1b2e); color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,.08); box-shadow: 0 6px 16px -8px rgba(0,0,0,.5); }
 .caixa { position: relative; display: flex; align-items: center; }
@@ -237,6 +251,7 @@ p { margin: 0; }
 .gaveta .acao { min-height: 48px; padding: 0 20px; border-top: 1px solid rgba(255,255,255,.1); border-radius: 0; }
 .gaveta .acao:hover { background: rgba(255,255,255,.07); }
 @media (max-width: 1180px) { .busca span, .busca kbd, .nome .sub { display: none; } }
+@media (max-width: 1100px) { .botao-menu .rotulo { display: none; } .botao-menu { padding: 0 10px; } }
 @media (max-width: 767px) {
   .barra { height: 56px; gap: 10px; padding: 0 12px; }
   .menu, .divisor, .caixa-usuario, .tema { display: none; }
@@ -261,7 +276,7 @@ p { margin: 0; }
         if (instancia) instancia.destruir();
 
         const op = Object.assign({}, opcoes);
-        const est = { aberto: null, sistemas: { situacao: 'parado', lista: [] }, termo: '', usuario: undefined, contadores: {} };
+        const est = { aberto: null, animou: null, sistemas: { situacao: 'parado', lista: [] }, termo: '', usuario: undefined, contadores: {} };
         const host = document.createElement('sge-barra');
         const raiz = host.attachShadow({ mode: 'open' });
         const alvo = op.alvo || document.body;
@@ -277,21 +292,27 @@ p { margin: 0; }
         function navegar(ev, href) {
             fechar();
             const simples = ev.button === 0 && !ev.ctrlKey && !ev.metaKey && !ev.shiftKey && !ev.altKey;
-            if (op.aoNavegar && simples) { ev.preventDefault(); op.aoNavegar(href, ev); }
+            if (op.aoNavegar && simples) {
+                ev.preventDefault();
+                op.aoNavegar(href, ev);
+                setTimeout(() => { if (host.isConnected) desenhar(); }, 0); // SPA: pushState não avisa; marca a tela nova
+            }
         }
 
         function link(href, classe, filhos, ativo) {
             return el('a', { href, classe, 'aria-current': ativo ? 'page' : null, onclick: (ev) => navegar(ev, href) }, filhos);
         }
 
-        function itemMenu(i, atual) {
-            return link(i.href, 'item', [
+        function itemMenu(i, atual, chave) {
+            const a = link(i.href, 'item', [
                 el('span', { classe: 'item-icone' }, [icone(i.icone || 'file-text', 17)]),
                 el('span', { classe: 'item-texto' }, [
                     el('span', { classe: 'item-rotulo' }, [i.rotulo, selo(numero(i.href))]),
                     i.texto ? el('span', { classe: 'item-desc', texto: i.texto }) : null,
                 ]),
             ], i.href === atual);
+            if (chave) a.setAttribute('data-chave', chave); // devolve o foco depois de redesenhar
+            return a;
         }
 
         function porGrupo(itens) {
@@ -302,20 +323,25 @@ p { margin: 0; }
 
         function secaoEl(s, n, atual) {
             const aceso = s.href === atual || (s.itens || []).some((i) => i.href === atual);
-            const miolo = [icone(s.icone || 'grade', 17), s.rotulo, selo(totalDaSecao(s))];
-            if (!s.itens) return link(s.href, 'botao-menu' + (aceso ? ' ativo' : ''), miolo, aceso);
+            const miolo = [icone(s.icone || 'grade', 17), el('span', { classe: 'rotulo', texto: s.rotulo }), selo(totalDaSecao(s))];
+            if (!s.itens) {
+                const a = link(s.href, 'botao-menu' + (aceso ? ' ativo' : ''), miolo, aceso);
+                a.setAttribute('title', s.rotulo);
+                a.setAttribute('data-chave', 'secao-' + n);
+                return a;
+            }
             const chave = 'secao-' + n;
             const aberto = est.aberto === chave;
             const caixa = el('div', { classe: 'caixa' }, [
                 el('button', { type: 'button', classe: 'botao-menu' + (aceso ? ' ativo' : ''), 'data-chave': chave,
-                    'aria-haspopup': 'menu', 'aria-expanded': String(aberto), onclick: () => alternar(chave) },
+                    'aria-haspopup': 'menu', 'aria-expanded': String(aberto), title: s.rotulo, onclick: () => alternar(chave) },
                     miolo.concat([icone('seta-baixo', 14)])),
             ]);
             if (aberto) {
-                caixa.appendChild(el('div', { classe: 'suspenso secao', role: 'menu' },
+                caixa.appendChild(el('div', { classe: 'suspenso secao' + animacao(chave), role: 'menu' },
                     [s.texto ? el('p', { classe: 'dica', texto: s.texto }) : null].concat(porGrupo(s.itens).map(([grupo, itens]) =>
                         el('div', { classe: 'grupo' }, [grupo ? el('p', { classe: 'grupo-titulo', texto: grupo }) : null]
-                            .concat(itens.map((i) => itemMenu(i, atual))))))));
+                            .concat(itens.map((i) => itemMenu(i, atual, 'item-' + n + '-' + s.itens.indexOf(i)))))))));
             }
             return caixa;
         }
@@ -398,20 +424,20 @@ p { margin: 0; }
             caixa.appendChild(el('button', { type: 'button', classe: 'avatar', 'data-chave': 'usuario', 'aria-haspopup': 'menu',
                 'aria-expanded': String(aberto), 'aria-label': 'Usuário ' + (u.email || u.nome), title: u.nome || u.email,
                 texto: iniciais(u.nome || u.email), onclick: () => alternar('usuario') }));
-            if (aberto) caixa.appendChild(el('div', { classe: 'suspenso direita usuario', role: 'menu' }, [cabecaUsuario(u), acaoSair()]));
+            if (aberto) caixa.appendChild(el('div', { classe: 'suspenso direita usuario' + animacao('usuario'), role: 'menu' }, [cabecaUsuario(u), acaoSair()]));
             return caixa;
         }
 
         function gavetaEls(atual) {
             const u = est.usuario;
             const nav = [];
-            secoes().forEach((s) => {
-                if (s.itens) nav.push(el('p', { classe: 'area', texto: s.rotulo }), ...s.itens.map((i) => itemMenu(i, atual)));
-                else nav.push(itemMenu(s, atual));
+            secoes().forEach((s, n) => {
+                if (s.itens) nav.push(el('p', { classe: 'area', texto: s.rotulo }), ...s.itens.map((i, k) => itemMenu(i, atual, 'gaveta-' + n + '-' + k)));
+                else nav.push(itemMenu(s, atual, 'gaveta-' + n));
             });
             return [
                 el('div', { classe: 'gaveta-fundo', onclick: fechar }),
-                el('aside', { classe: 'gaveta', role: 'dialog', 'aria-label': 'Menu' }, [
+                el('aside', { classe: 'gaveta' + animacao('gaveta'), role: 'dialog', 'aria-label': 'Menu' }, [
                     u ? cabecaUsuario(u) : null,
                     el('nav', null, nav),
                     el('button', { type: 'button', classe: 'acao', onclick: alternarTema }, [icone('tema', 18), 'Tema claro / escuro']),
@@ -420,11 +446,20 @@ p { margin: 0; }
             ];
         }
 
+        // Painel já aberto não repete a animação ao redesenhar (ex.: contador mudou).
+        const animacao = (chave) => (est.animou === chave ? ' sem-animacao' : '');
+
         function desenhar() {
             const ativo = raiz.activeElement;
             const foco = ativo && ativo.getAttribute && ativo.getAttribute('data-chave');
+            const painel = raiz.querySelector('.suspenso, .gaveta');
+            const rolagem = painel ? painel.scrollTop : 0;
+            // A grade aberta é reaproveitada: a busca não perde o texto, o cursor nem a rolagem.
+            const gradeAberta = est.aberto === 'grade' ? raiz.querySelector('.grade') : null;
+            if (gradeAberta) gradeAberta.classList.add('sem-animacao');
             const visiveis = secoes();
-            const atual = telaAtual(visiveis, caminho());
+            // Sem "atual" do sistema: vale o caminho; se nada bater, o # do endereço (sistemas que trocam de tela pelo #).
+            const atual = telaAtual(visiveis, caminho()) || (op.atual ? null : telaAtual(visiveis, location.hash));
             let rotuloAtual = null;
             visiveis.forEach((s) => [s].concat(s.itens || []).forEach((i) => { if (i.href === atual) rotuloAtual = i.rotulo; }));
             const barra = el('header', { classe: 'barra' }, [
@@ -432,7 +467,7 @@ p { margin: 0; }
                     el('button', { type: 'button', classe: 'logo', 'data-chave': 'grade', 'aria-haspopup': 'dialog',
                         'aria-expanded': String(est.aberto === 'grade'), 'aria-label': 'Sistemas do SGE', title: 'Sistemas do SGE',
                         onclick: () => alternar('grade') }, [el('img', { src: core.logo(), alt: '' })]),
-                    est.aberto === 'grade' ? gradeEl() : null,
+                    est.aberto === 'grade' ? (gradeAberta || gradeEl()) : null,
                 ]),
                 el('a', { classe: 'nome', href: op.inicio || location.pathname, onclick: (ev) => navegar(ev, op.inicio || location.pathname) }, [
                     el('strong', { texto: op.nome || '' }),
@@ -451,6 +486,9 @@ p { margin: 0; }
                     'aria-expanded': String(est.aberto === 'gaveta'), onclick: () => alternar('gaveta') }, [icone('menu', 20)]),
             ]);
             raiz.replaceChildren(el('style', { texto: CSS }), barra, ...(est.aberto === 'gaveta' ? gavetaEls(atual) : []));
+            const novo = raiz.querySelector('.suspenso, .gaveta');
+            if (novo && painel && novo !== painel && est.aberto === est.animou) novo.scrollTop = rolagem;
+            est.animou = est.aberto;
             if (foco) focar(foco);
         }
 
@@ -476,7 +514,8 @@ p { margin: 0; }
         }
 
         async function carregarSistemas(forcar) {
-            const guardada = forcar ? null : lerCache();
+            const id = est.usuario && est.usuario.id;
+            const guardada = forcar ? null : lerCache(id);
             if (guardada) { est.sistemas = { situacao: 'ok', lista: guardada }; return; }
             if (est.sistemas.situacao === 'carregando') return;
             est.sistemas = { situacao: 'carregando', lista: [] };
@@ -485,7 +524,7 @@ p { margin: 0; }
                 const { data, error } = await core.acesso.conexao().rpc('sge_meus_sistemas');
                 if (error) throw error;
                 const lista = data && data.ativo && Array.isArray(data.sistemas) ? data.sistemas : [];
-                guardarCache(lista);
+                guardarCache(id, lista);
                 est.sistemas = { situacao: 'ok', lista };
             } catch (e) {
                 console.warn('[SGE] Barra: não consegui listar os sistemas.', e);
@@ -497,13 +536,13 @@ p { margin: 0; }
         async function carregarUsuario() {
             const a = core.acesso;
             if (a.usuario) {
-                est.usuario = { nome: a.usuario.nome, email: a.usuario.email, papel: a.papel };
+                est.usuario = { id: a.usuario.id, nome: a.usuario.nome, email: a.usuario.email, papel: a.papel };
             } else {
                 try {
                     const { data } = await a.conexao().auth.getSession();
                     const u = data && data.session && data.session.user;
                     const meta = (u && u.user_metadata) || {};
-                    est.usuario = u ? { nome: meta.full_name || meta.nome || u.email, email: u.email || '', papel: null } : null;
+                    est.usuario = u ? { id: u.id, nome: meta.full_name || meta.nome || u.email, email: u.email || '', papel: null } : null;
                 } catch (_) { est.usuario = null; }
             }
             if (host.isConnected) desenhar();
@@ -521,7 +560,7 @@ p { margin: 0; }
 
         function sair() {
             fechar();
-            try { sessionStorage.removeItem(CHAVE_CACHE); } catch (_) { /* nada guardado */ }
+            limparCache();
             if (op.aoSair) op.aoSair(); else core.acesso.sair(op.sistema);
         }
 
@@ -544,6 +583,7 @@ p { margin: 0; }
 
         document.addEventListener('keydown', teclas);
         document.addEventListener('mousedown', cliqueFora);
+        document.addEventListener('pointerdown', cliqueFora); // toque no iPad/iPhone não gera mousedown fora de links
         window.addEventListener('popstate', desenhar);
         window.addEventListener('hashchange', desenhar);
 
@@ -560,6 +600,7 @@ p { margin: 0; }
             destruir() {
                 document.removeEventListener('keydown', teclas);
                 document.removeEventListener('mousedown', cliqueFora);
+                document.removeEventListener('pointerdown', cliqueFora);
                 window.removeEventListener('popstate', desenhar);
                 window.removeEventListener('hashchange', desenhar);
                 host.remove();

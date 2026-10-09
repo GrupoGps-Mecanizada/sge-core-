@@ -286,3 +286,84 @@ test('uma barra só por página; destruir tira a barra e o Ctrl+K', async () => 
     assert.equal(chamou, 0);
     t.fechar();
 });
+
+// ── Correções da revisão final ───────────────────────────
+
+test('revisão: tipografia própria (fonte do sistema não entra) e rótulos escondíveis no tablet', async () => {
+    const t = await abrir();
+    const css = t.$('style').textContent;
+    assert.match(css, /.barra, .gaveta {[^}]*letter-spacing: normal/);
+    assert.match(css, /.barra, .gaveta {[^}]*font-family:/);
+    assert.ok(t.$('[data-chave="secao-1"] .rotulo'));
+    assert.equal(t.$('[data-chave="secao-1"]').getAttribute('title'), 'Colaboradores');
+    t.fechar();
+});
+
+test('revisão: redesenhar com a grade aberta não recria a busca nem perde o texto', async () => {
+    const t = await abrir();
+    t.$('[data-chave="grade"]').click(); await pausa(5);
+    const campo = t.$('[data-chave="busca-grade"]');
+    campo.value = 'efe';
+    campo.dispatchEvent(new t.w.Event('input', { bubbles: true }));
+    t.barra.contador('/sst/matriz', 2);
+    assert.equal(t.$('[data-chave="busca-grade"]'), campo);
+    assert.equal(campo.value, 'efe');
+    assert.deepEqual(t.$$('.ladrilho').map((a) => a.textContent), ['Gestão de Efetivo']);
+    t.fechar();
+});
+
+test('revisão: redesenhar com submenu aberto mantém o foco no item e não repete a animação', async () => {
+    const t = await abrir();
+    t.$('[data-chave="secao-1"]').click();
+    const link = t.$$('.suspenso a.item')[0];
+    link.focus();
+    const chave = link.getAttribute('data-chave');
+    assert.ok(chave);
+    t.barra.contador('/sst/matriz', 4);
+    assert.equal(t.raiz.activeElement && t.raiz.activeElement.getAttribute('data-chave'), chave);
+    assert.ok(t.$('.suspenso').classList.contains('sem-animacao'));
+    t.fechar();
+});
+
+test('revisão: depois do aoNavegar (SPA) a tela ativa acompanha a troca de endereço', async () => {
+    const t = await abrir({ opcoes: { aoNavegar: (href) => t.w.history.pushState(null, '', href) } });
+    const inicio = t.$('.menu > a.botao-menu');
+    inicio.dispatchEvent(new t.w.MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
+    await pausa(5);
+    assert.ok(t.$('.menu > a.botao-menu').classList.contains('ativo'));
+    assert.ok(!t.$('[data-chave="secao-1"]').classList.contains('ativo'));
+    t.fechar();
+});
+
+test('revisão: lista guardada é de cada usuário (não mostra a lista de outra pessoa)', async () => {
+    const supa = supabaseFalso({ sistemas: { data: { ativo: true, sistemas: SISTEMAS }, error: null } });
+    const m = montar({ supa, url: 'https://sge-portal.pages.dev/sst/', extras: ['sge-icones.js', 'sge-barra.js'], antes: (w) => {
+        silenciar(w);
+        const outra = JSON.stringify({ em: Date.now(), lista: [{ slug: 'z', nome: 'De outra pessoa', url_origem: '/z/' }] });
+        w.sessionStorage.setItem('sge_barra_sistemas', outra);
+        w.sessionStorage.setItem('sge_barra_sistemas:u-2', outra);
+    } });
+    const barra = m.w.SGE.barra.montar({ sistema: 'sst', nome: 'SST' });
+    await pausa(5);
+    barra.host.shadowRoot.querySelector('[data-chave="grade"]').click(); await pausa(5);
+    assert.equal(sistemasRpc(supa), 1);
+    assert.doesNotMatch(barra.host.shadowRoot.querySelector('.lista-grade').textContent, /De outra pessoa/);
+    m.fechar();
+});
+
+test('revisão: sem "atual", endereços com # são marcados pelo location.hash', async () => {
+    const t = await abrir({ url: 'https://sge-portal.pages.dev/app/#matriz', opcoes: { secoes: [
+        { rotulo: 'Início', icone: 'home', href: '#inicio' },
+        { rotulo: 'Colaboradores', icone: 'users', itens: [{ rotulo: 'Matriz', href: '#matriz' }] },
+    ] } });
+    assert.ok(t.$('[data-chave="secao-1"]').classList.contains('ativo'));
+    t.fechar();
+});
+
+test('revisão: toque fora (pointerdown, iPad) fecha', async () => {
+    const t = await abrir();
+    t.$('[data-chave="secao-1"]').click();
+    t.w.document.body.dispatchEvent(new t.w.Event('pointerdown', { bubbles: true }));
+    assert.equal(t.$('.suspenso'), null);
+    t.fechar();
+});

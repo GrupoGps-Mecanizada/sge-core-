@@ -74,6 +74,7 @@ A mesma barra de topo em todos os sistemas: logo SGE (abre a grade com os sistem
 <script src="/sge-core-/v1/sge-icones.js"></script>
 <script src="/sge-core-/v1/sge-barra.js"></script>
 <script>
+(async () => {
   const barra = SGE.barra.montar({
     sistema: 'gestao_efetivo_mec', nome: 'Gestão de Efetivo', area: 'Mecanizada', inicio: '/Gest-o-Efetivo/',
     secoes: [
@@ -86,8 +87,10 @@ A mesma barra de topo em todos os sistemas: logo SGE (abre a grade com os sistem
   });
   await SGE.acesso.entrar('gestao_efetivo_mec');
   barra.atualizar(); // depois do login: esconde o que a pessoa não pode ver e mostra o nome dela
+})();
 </script>
 ```
+- Sistema que troca de tela sem recarregar (React/Next, `history.pushState`): chame `barra.atualizar()` a cada troca de tela (no Next: num `useEffect` com o `usePathname()`), e monte a barra só depois que a página carregar (`useEffect`).
 - `tela` no item = só aparece para quem tem essa tela liberada. `barra.contador(href, n)` põe um número ao lado (0 esconde).
 - O visual fica isolado (Shadow DOM): o CSS do sistema não estraga a barra. Deixe o `<body>` sem margem (`margin: 0`) para a barra encostar nas bordas.
 - Ícones: `SGE.icone('truck', 20)` e a lista em `SGE.icones`. Ícone e cor de cada sistema vêm da tela de Sistemas da Central.
