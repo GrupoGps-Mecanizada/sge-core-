@@ -67,10 +67,11 @@ const sistemasRpc = (supa) => supa.chamadas.rpc.filter(([n]) => n === 'sge_meus_
 const tecla = (w, o) => w.document.dispatchEvent(new w.KeyboardEvent('keydown', Object.assign({ bubbles: true, cancelable: true }, o)));
 const LOGIN = /sso_login\.html\?app_slug=sst/;
 
-async function abrir({ opcoes = {}, cfg = {}, entrar = false, url = 'https://sge-portal.pages.dev/sst/matriz' } = {}) {
+async function abrir({ opcoes = {}, cfg = {}, entrar = false, url = 'https://sge-portal.pages.dev/sst/matriz', antesDeMontar } = {}) {
     const supa = supabaseFalso(Object.assign({ sistemas: { data: { ativo: true, nome: 'Maria Teste', sistemas: SISTEMAS }, error: null } }, cfg));
     const m = montar({ supa, url, extras: ['sge-icones.js', 'sge-barra.js'], antes: silenciar });
     if (entrar) await m.w.SGE.acesso.entrar('sst');
+    if (antesDeMontar) antesDeMontar(m.w);
     const barra = m.w.SGE.barra.montar(Object.assign({ sistema: 'sst', nome: 'SST', area: 'Mecanizada', inicio: '/sst/', secoes: SECOES }, opcoes));
     await pausa(5);
     const raiz = barra.host.shadowRoot;
@@ -364,5 +365,64 @@ test('revisão: toque fora (pointerdown, iPad) fecha', async () => {
     t.$('[data-chave="secao-1"]').click();
     t.w.document.body.dispatchEvent(new t.w.Event('pointerdown', { bubbles: true }));
     assert.equal(t.$('.suspenso'), null);
+    t.fechar();
+});
+
+// ── v1.3: portal ─────────────────────────────────────────
+
+const clique = (w, el) => { const ev = new w.MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }); el.dispatchEvent(ev); return ev; };
+const ladrilhoDe = (t, href) => t.$$('.ladrilho').find((a) => a.getAttribute('href') === href);
+
+test('transparente: fixa no topo e ganha fundo ao rolar', async () => {
+    const t = await abrir({ opcoes: { transparente: true } });
+    assert.ok(t.barra.host.classList.contains('transparente'));
+    assert.ok(t.$('.barra').classList.contains('vidro'));
+    Object.defineProperty(t.w, 'scrollY', { value: 40, configurable: true });
+    t.w.dispatchEvent(new t.w.Event('scroll'));
+    assert.ok(t.$('.barra').classList.contains('fosco'));
+    t.barra.atualizar({ transparente: false });
+    assert.ok(!t.barra.host.classList.contains('transparente'));
+    assert.ok(!t.$('.barra').classList.contains('fosco'));
+    t.fechar();
+});
+
+test('aoAbrirSistema e aoIrInicio: a grade avisa em vez de navegar (abre fora continua normal)', async () => {
+    const feitos = [];
+    const t = await abrir({ opcoes: { aoAbrirSistema: (slug) => feitos.push('abrir ' + slug), aoIrInicio: () => feitos.push('inicio') } });
+    t.$('[data-chave="grade"]').click(); await pausa(5);
+    const ev = clique(t.w, ladrilhoDe(t, '/Gest-o-Efetivo/'));
+    assert.equal(ev.defaultPrevented, true);
+    t.$('[data-chave="grade"]').click(); await pausa(5);
+    const fora = clique(t.w, ladrilhoDe(t, 'https://outro.web.app/'));
+    assert.equal(fora.defaultPrevented, false);
+    t.$('[data-chave="grade"]').click(); await pausa(5);
+    clique(t.w, t.$('.rodape'));
+    assert.deepEqual(feitos, ['abrir efetivo', 'inicio']);
+    t.fechar();
+});
+
+test('dentro do portal: registra a barra e usa o portal para abrir, voltar e sair', async () => {
+    const feitos = [];
+    const portal = { abrir: (s) => feitos.push('abrir ' + s), inicio: () => feitos.push('inicio'), sair: () => feitos.push('sair'), entrar: () => feitos.push('entrar'), registrarBarra: (w) => feitos.push(w ? 'registrou' : 'sem janela') };
+    const t = await abrir({ entrar: true, antesDeMontar: (w) => { w.SGE.barra._acharPortal = () => portal; } });
+    t.$('[data-chave="grade"]').click(); await pausa(5);
+    clique(t.w, ladrilhoDe(t, '/Gest-o-Efetivo/'));
+    t.$('[data-chave="grade"]').click(); await pausa(5);
+    clique(t.w, t.$('.rodape'));
+    t.$('[data-chave="usuario"]').click();
+    t.$('.usuario .acao').click();
+    await pausa(5);
+    assert.deepEqual(feitos, ['registrou', 'abrir efetivo', 'inicio', 'sair']);
+    assert.equal(t.idas.length, 0);
+    t.fechar();
+});
+
+test('dentro do portal sem sessão: Entrar chama o portal', async () => {
+    const feitos = [];
+    const portal = { abrir() {}, inicio() {}, sair() {}, entrar: () => feitos.push('entrar'), registrarBarra() {} };
+    const t = await abrir({ cfg: { sessao: null }, antesDeMontar: (w) => { w.SGE.barra._acharPortal = () => portal; } });
+    t.$('[data-chave="entrar"]').click();
+    assert.deepEqual(feitos, ['entrar']);
+    assert.equal(t.idas.length, 0);
     t.fechar();
 });

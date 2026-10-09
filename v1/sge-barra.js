@@ -165,7 +165,10 @@ p { margin: 0; }
 .barra, .gaveta { font-family: var(--sge-fonte, 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif); font-size: 14px; font-weight: 400; font-style: normal; line-height: normal; letter-spacing: normal; word-spacing: normal; text-transform: none; text-align: left; text-indent: 0; white-space: normal; }
 .sem-animacao { animation: none !important; }
 :focus-visible { outline: 2px solid #f59e0b; outline-offset: 2px; }
-.barra { display: flex; align-items: center; gap: 12px; height: 62px; padding: 0 20px; background: var(--sge-marca-escura, #0d1b2e); color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,.08); box-shadow: 0 6px 16px -8px rgba(0,0,0,.5); }
+.barra { display: flex; align-items: center; gap: 12px; height: 62px; padding: 0 20px; background: var(--sge-marca-escura, #0d1b2e); color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,.08); box-shadow: 0 6px 16px -8px rgba(0,0,0,.5); transition: background .25s, box-shadow .25s, border-color .25s; }
+:host(.transparente) { position: fixed; top: 0; left: 0; right: 0; }
+.barra.vidro { background: transparent; border-bottom-color: transparent; box-shadow: none; }
+.barra.fosco { background: rgba(13,27,46,.82); -webkit-backdrop-filter: saturate(140%) blur(12px); backdrop-filter: saturate(140%) blur(12px); }
 .caixa { position: relative; display: flex; align-items: center; }
 .logo { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .15s, box-shadow .15s; }
 .logo:hover, .logo[aria-expanded="true"] { transform: scale(1.05); box-shadow: 0 0 0 3px rgba(255,255,255,.18); }
@@ -272,7 +275,16 @@ p { margin: 0; }
         if (instancia) instancia.destruir();
 
         const op = Object.assign({}, opcoes);
-        const est = { aberto: null, animou: null, sistemas: { situacao: 'parado', lista: [] }, termo: '', usuario: undefined, contadores: {} };
+        const est = { aberto: null, animou: null, rolou: false, sistemas: { situacao: 'parado', lista: [] }, termo: '', usuario: undefined, contadores: {} };
+        // Dentro do Portal SGE: trocar de sistema, voltar ao início, sair e entrar passam pelo portal (página de cima).
+        const portal = SGE.barra._acharPortal();
+        if (portal) {
+            op.aoAbrirSistema = op.aoAbrirSistema || ((slug) => portal.abrir(slug));
+            op.aoIrInicio = op.aoIrInicio || (() => portal.inicio());
+            op.aoSair = op.aoSair || (() => portal.sair());
+            op.aoEntrar = op.aoEntrar || (() => portal.entrar());
+            try { portal.registrarBarra(window); } catch (_) { /* portal antigo: segue sem avisar */ } // o portal esconde a barra dele
+        }
         const host = document.createElement('sge-barra');
         const raiz = host.attachShadow({ mode: 'open' });
         const alvo = op.alvo || document.body;
@@ -285,10 +297,12 @@ p { margin: 0; }
         const totalDaSecao = (s) => numero(s.href) + (s.itens || []).reduce((t, i) => t + numero(i.href), 0);
         const focar = (chave) => { const f = raiz.querySelector('[data-chave="' + chave + '"]'); if (f) f.focus(); };
 
+        // Clique simples (sem Ctrl, Shift, Alt ou botão do meio): pode ser tratado pela própria página.
+        const simples = (ev) => ev.button === 0 && !ev.ctrlKey && !ev.metaKey && !ev.shiftKey && !ev.altKey;
+
         function navegar(ev, href) {
             fechar();
-            const simples = ev.button === 0 && !ev.ctrlKey && !ev.metaKey && !ev.shiftKey && !ev.altKey;
-            if (op.aoNavegar && simples) {
+            if (op.aoNavegar && simples(ev)) {
                 ev.preventDefault();
                 op.aoNavegar(href, ev);
                 setTimeout(() => { if (host.isConnected) desenhar(); }, 0); // SPA: pushState não avisa; marca a tela nova
@@ -347,7 +361,11 @@ p { margin: 0; }
             return el('a', {
                 classe: 'ladrilho', href: s.endereco, title: s.nome,
                 target: s.abre_fora ? '_blank' : null, rel: s.abre_fora ? 'noopener' : null,
-                'aria-current': s.slug === op.sistema ? 'page' : null, onclick: () => fechar(),
+                'aria-current': s.slug === op.sistema ? 'page' : null,
+                onclick: (ev) => {
+                    fechar();
+                    if (op.aoAbrirSistema && !s.abre_fora && simples(ev)) { ev.preventDefault(); op.aoAbrirSistema(s.slug, ev); }
+                },
             }, [quadrado, el('span', { classe: 'nome-sis', texto: s.nome }),
                 s.abre_fora ? el('span', { classe: 'fora', title: 'Abre em outra aba' }, [icone('abrir-fora', 12)]) : null]);
         }
@@ -388,7 +406,10 @@ p { margin: 0; }
                     'data-chave': 'busca-grade', value: est.termo || null,
                     oninput: (ev) => { est.termo = ev.target.value; preencherLista(); } }),
                 lista,
-                el('a', { classe: 'rodape', href: location.origin + '/' }, [icone('home', 16), 'Página inicial do SGE']),
+                el('a', { classe: 'rodape', href: location.origin + '/', onclick: (ev) => {
+                    fechar();
+                    if (op.aoIrInicio && simples(ev)) { ev.preventDefault(); op.aoIrInicio(ev); }
+                } }, [icone('home', 16), 'Página inicial do SGE']),
             ]);
             preencherLista(lista);
             return painel;
@@ -457,7 +478,9 @@ p { margin: 0; }
             const atual = telaAtual(visiveis, caminho()) || (op.atual ? null : telaAtual(visiveis, location.hash));
             let rotuloAtual = null;
             visiveis.forEach((s) => [s].concat(s.itens || []).forEach((i) => { if (i.href === atual) rotuloAtual = i.rotulo; }));
-            const barra = el('header', { classe: 'barra' }, [
+            host.classList.toggle('transparente', !!op.transparente);
+            const vidro = op.transparente ? (est.rolou ? ' fosco' : ' vidro') : '';
+            const barra = el('header', { classe: 'barra' + vidro }, [
                 el('div', { classe: 'caixa' }, [
                     el('button', { type: 'button', classe: 'logo', 'data-chave': 'grade', 'aria-haspopup': 'dialog',
                         'aria-expanded': String(est.aberto === 'grade'), 'aria-label': 'Sistemas do SGE', title: 'Sistemas do SGE',
@@ -551,7 +574,7 @@ p { margin: 0; }
             desenhar();
         }
 
-        function entrar() { core.acesso.irParaLogin(op.sistema); }
+        function entrar() { if (op.aoEntrar) op.aoEntrar(); else core.acesso.irParaLogin(op.sistema); }
 
         function sair() {
             fechar();
@@ -581,6 +604,14 @@ p { margin: 0; }
         document.addEventListener('pointerdown', cliqueFora); // toque no iPad/iPhone não gera mousedown fora de links
         window.addEventListener('popstate', desenhar);
         window.addEventListener('hashchange', desenhar);
+        // Barra transparente: ganha fundo quando a página rola.
+        function rolagem() {
+            const rolou = (window.scrollY || 0) > 8;
+            if (rolou === est.rolou) return;
+            est.rolou = rolou;
+            if (op.transparente) desenhar();
+        }
+        window.addEventListener('scroll', rolagem, { passive: true });
 
         aplicarTemaGuardado();
         desenhar();
@@ -598,6 +629,7 @@ p { margin: 0; }
                 document.removeEventListener('pointerdown', cliqueFora);
                 window.removeEventListener('popstate', desenhar);
                 window.removeEventListener('hashchange', desenhar);
+                window.removeEventListener('scroll', rolagem);
                 host.remove();
                 if (instancia === api) instancia = null;
             },
@@ -607,7 +639,11 @@ p { margin: 0; }
     }
 
     SGE.barra = {
-        versao: '1.2.0',
+        versao: '1.3.0',
+        // Portal SGE na página de cima (mesmo endereço); fora dele, ou em outro endereço, devolve null.
+        _acharPortal() {
+            try { return window.top !== window && window.top.SGEPortal ? window.top.SGEPortal : null; } catch (_) { return null; }
+        },
         montar,
         _regras: { enderecoNoPortal, agruparPorArea, prepararSistemas, telaAtual, secoesVisiveis, iniciais },
     };

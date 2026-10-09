@@ -1,5 +1,9 @@
 # Mudanças do SGE Core
 
+## v1.3.0 · 2026-10-09
+- Barra Universal pronta para o Portal SGE: `transparente` (fixa no topo, ganha fundo ao rolar), `aoAbrirSistema(slug)`, `aoIrInicio()` e `aoEntrar()`.
+- Dentro do portal, a barra se registra (`SGEPortal.registrarBarra`) para o portal esconder a barra dele, e trocar de sistema, voltar ao início, sair e entrar passam pelo portal. Testes: 69.
+
 ## v1.2.0 · 2026-10-09
 - Novo `sge-icones.js`: `SGE.icone(nome, tamanho)` e `SGE.icones` — ícones de linha (Lucide, licença ISC) para os sistemas e a barra.
 - Novo `sge-barra.js`: `SGE.barra.montar({...})` — barra de topo universal (logo SGE com a grade de sistemas, menus do sistema com permissão por tela, busca Ctrl+K, tema claro/escuro, usuário e Sair; gaveta no celular). Estilo isolado (Shadow DOM). Marca a tela atual por caminho ou por `#`.
