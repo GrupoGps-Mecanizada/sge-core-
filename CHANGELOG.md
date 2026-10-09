@@ -1,5 +1,8 @@
 # Mudanças do SGE Core
 
+## v1.4.1 · 2026-10-09
+- Capacete (SST) também preenchido.
+
 ## v1.4.0 · 2026-10-09
 - `SGE.iconeCheio(nome, tamanho)`: ícones preenchidos (desenho cheio, detalhes vazados) para os sistemas; sem versão cheia, usa o de linha.
 - Barra: opção `clara` (para páginas de fundo claro, como o Portal SGE) e grade de sistemas com os ícones preenchidos no azul claro do SGE (#4A7BC8). Testes: 72.

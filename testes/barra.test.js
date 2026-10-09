@@ -438,8 +438,9 @@ test('ícone preenchido: desenho cheio na cor do texto; sem versão cheia, usa o
     assert.equal(cheio.getAttribute('width'), '30');
     assert.equal(w.SGE.iconeCheio('default').getAttribute('data-icone'), 'grade');
     assert.equal(w.SGE.iconeCheio('default').getAttribute('fill'), 'currentColor');
-    const linha = w.SGE.iconeCheio('hard-hat');
-    assert.equal(linha.getAttribute('data-icone'), 'hard-hat');
+    assert.equal(w.SGE.iconeCheio('hard-hat').getAttribute('fill'), 'currentColor');
+    const linha = w.SGE.iconeCheio('bell');
+    assert.equal(linha.getAttribute('data-icone'), 'bell');
     assert.equal(linha.getAttribute('stroke'), 'currentColor');
     ['truck', 'clipboard', 'tablet', 'ruler', 'wrench', 'box', 'users', 'check-circle', 'clock', 'shield']
         .forEach((n) => assert.equal(w.SGE.iconeCheio(n).getAttribute('fill'), 'currentColor', n));
