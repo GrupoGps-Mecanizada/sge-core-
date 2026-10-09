@@ -47,7 +47,12 @@ O que o `entrar` faz: usa a sessão real do login da Central (Supabase Auth); se
 | `SGE.acesso.temPapel('ADMIN', 'GESTOR')` | a pessoa tem um desses papéis? |
 | `SGE.acesso.aplicar(elemento?)` | reaplica o filtro (já roda sozinho, inclusive em conteúdo criado depois) |
 | `SGE.acesso.reconferir()` | confere agora, sem esperar os 5 minutos |
-| `SGE.acesso.sair()` | sai neste navegador e volta para o login |
+| `SGE.acesso.sair(slug?)` | sai neste navegador e volta para o login (o `slug` é opcional se já chamou `entrar`) |
+| `SGE.acesso.irParaLogin(slug?)` | vai para o login da Central (com a proteção contra vai-e-volta); a promessa nunca resolve |
+| `SGE.acesso.tipoDeErro(e)` | devolve `'login'`, `'rede'` ou `'outro'` |
+| `SGE.acesso.central` | endereço da Central (o mesmo em que o sistema está aberto: portal ou github.io) |
+
+Teste local sem o portal: `window.SGE_CENTRAL_URL_OVERRIDE = 'https://grupogps-mecanizada.github.io/SGE-CENTRAL'` antes do sge-core.
 
 No HTML, para esconder sozinho:
 ```html

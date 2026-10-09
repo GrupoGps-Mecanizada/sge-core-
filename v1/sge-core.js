@@ -24,13 +24,22 @@
 
     if (window.SGECore) return; // já carregado
 
-    const VERSAO = '1.1.0';
+    const VERSAO = '1.1.1';
+
+    // A Central fica no mesmo endereço em que o sistema está aberto (portal ou github.io),
+    // para a sessão do Supabase ser a mesma. Testes locais usam SGE_CENTRAL_URL_OVERRIDE.
+    function _centralPadrao() {
+        if (window.SGE_CENTRAL_URL_OVERRIDE) return window.SGE_CENTRAL_URL_OVERRIDE;
+        const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+        if (/^https?:$/.test(location.protocol) && !local) return location.origin + '/SGE-CENTRAL';
+        return 'https://grupogps-mecanizada.github.io/SGE-CENTRAL';
+    }
 
     // Projeto da Central (login e permissões). A chave é a PÚBLICA (anon): pode ficar no navegador.
     const ACESSO = {
         url: 'https://mgcjidryrjqiceielmzp.supabase.co',
         chave: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1nY2ppZHJ5cmpxaWNlaWVsbXpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjEwNzEsImV4cCI6MjA4NzY5NzA3MX0.UAKkzy5fMIkrlmnqz9E9KknUw9xhoYpa3f1ptRpOuAA',
-        central: window.SGE_CENTRAL_URL_OVERRIDE || 'https://grupogps-mecanizada.github.io/SGE-CENTRAL',
+        central: _centralPadrao(),
         reconferirMs: 5 * 60 * 1000,
         ausenteMs: 30 * 1000,
     };
@@ -365,7 +374,8 @@
         _mostrarTela(r.situacao === 'login' ? { situacao: 'sessao_terminou' } : r);
     }
 
-    function _irParaLogin() {
+    function _irParaLogin(slug) {
+        slug = slug || _acesso.slug;
         // Proteção contra vai-e-volta infinito (ex.: navegador bloqueando os dados do site).
         const agora = Date.now();
         let voltas = [];
@@ -379,8 +389,8 @@
         try { sessionStorage.setItem(_CHAVE_VOLTAS, JSON.stringify(voltas)); } catch (_) {}
 
         let destino = ACESSO.central + '/sso_login.html';
-        if (_acesso.slug) {
-            destino += '?app_slug=' + encodeURIComponent(_acesso.slug)
+        if (slug) {
+            destino += '?app_slug=' + encodeURIComponent(slug)
                 + '&redirect=' + encodeURIComponent(location.origin + location.pathname);
         }
         acesso._ir(destino);
@@ -658,11 +668,18 @@
         }
     }
 
-    async function sair() {
+    async function sair(slug) {
         _encerrar();
+        if (!_acesso.db) { try { _acesso.db = cliente(ACESSO.url, ACESSO.chave); } catch (_) {} }
         try { if (_acesso.db) await _acesso.db.auth.signOut({ scope: 'local' }); } catch (_) {}
         try { sessionStorage.removeItem(_CHAVE_VOLTAS); } catch (_) {}
-        return _irParaLogin();
+        return _irParaLogin(slug);
+    }
+
+    function tipoDeErro(e) {
+        if (_eErroDeLogin(e)) return 'login';
+        if (_eErroDeRede(e)) return 'rede';
+        return 'outro';
     }
 
     const acesso = {
@@ -673,6 +690,9 @@
         aplicar,
         reconferir,
         sair,
+        irParaLogin: (slug) => _irParaLogin(slug),
+        tipoDeErro,
+        get central() { return ACESSO.central; },
         get usuario() { return _acesso.perm ? Object.assign({}, _acesso.usuario) : null; },
         get papel() { return _acesso.perm ? _acesso.perm.papel : null; },
         get permissoes() { return _acesso.perm ? JSON.parse(JSON.stringify(_acesso.perm)) : null; },

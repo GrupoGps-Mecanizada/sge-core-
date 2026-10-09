@@ -283,3 +283,50 @@ test('sair encerra a sessão só neste navegador e volta ao login', async () => 
     assert.equal(w.SGE.acesso.papel, null);
     fechar();
 });
+
+test('Central no mesmo endereço do sistema (portal ou github.io)', () => {
+    const casos = [
+        ['https://sge-portal.pages.dev/Gest-o-Efetivo/', 'https://sge-portal.pages.dev/SGE-CENTRAL'],
+        ['https://grupogps-mecanizada.github.io/Gest-o-Efetivo/', 'https://grupogps-mecanizada.github.io/SGE-CENTRAL'],
+        ['http://localhost:5500/', 'https://grupogps-mecanizada.github.io/SGE-CENTRAL'],
+    ];
+    casos.forEach(([url, central]) => {
+        const { w, fechar } = montar({ url, supa: supabaseFalso() });
+        assert.equal(w.SGE.acesso.central, central);
+        fechar();
+    });
+});
+
+test('SGE_CENTRAL_URL_OVERRIDE vence a regra automática', () => {
+    const { w, fechar } = montar({ supa: supabaseFalso(), antes: (w) => { w.SGE_CENTRAL_URL_OVERRIDE = 'http://localhost:8788/SGE-CENTRAL'; } });
+    assert.equal(w.SGE.acesso.central, 'http://localhost:8788/SGE-CENTRAL');
+    fechar();
+});
+
+test('irParaLogin(slug) funciona sem ter chamado entrar', async () => {
+    const { w, idas, fechar } = montar({ url: 'https://sge-portal.pages.dev/', supa: supabaseFalso() });
+    const r = await esperar(w.SGE.acesso.irParaLogin('sge_portal'));
+    assert.equal(r.resolveu, false);
+    const destino = new URL(idas[0]);
+    assert.equal(destino.origin + destino.pathname, 'https://sge-portal.pages.dev/SGE-CENTRAL/sso_login.html');
+    assert.equal(destino.searchParams.get('app_slug'), 'sge_portal');
+    assert.equal(destino.searchParams.get('redirect'), 'https://sge-portal.pages.dev/');
+    fechar();
+});
+
+test('sair(slug) usa o slug informado', async () => {
+    const supa = supabaseFalso();
+    const { w, idas, fechar } = montar({ url: 'https://sge-portal.pages.dev/', supa });
+    w.SGE.cliente(); // portal cria a conexão sem chamar entrar
+    await esperar(w.SGE.acesso.sair('sge_portal'));
+    assert.equal(new URL(idas[0]).searchParams.get('app_slug'), 'sge_portal');
+    fechar();
+});
+
+test('tipoDeErro separa login, rede e outros', () => {
+    const { w, fechar } = montar({ supa: supabaseFalso() });
+    assert.equal(w.SGE.acesso.tipoDeErro({ status: 401 }), 'login');
+    assert.equal(w.SGE.acesso.tipoDeErro({ message: 'TypeError: Failed to fetch' }), 'rede');
+    assert.equal(w.SGE.acesso.tipoDeErro({ code: '23505' }), 'outro');
+    fechar();
+});
