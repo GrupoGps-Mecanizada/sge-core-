@@ -224,7 +224,7 @@ test('usuário: iniciais, nome, papel e Sair vai para o login', async () => {
     avatar.click();
     assert.match(t.$('.usuario').textContent, /Maria Teste/);
     assert.match(t.$('.usuario').textContent, /GESTOR/);
-    t.$('.usuario .acao').click();
+    t.$$('.usuario .acao').find((b) => /Sair/.test(b.textContent)).click();
     await pausa(10);
     assert.equal(t.idas.length, 1);
     assert.match(t.idas[0], LOGIN);
@@ -410,7 +410,7 @@ test('dentro do portal: registra a barra e usa o portal para abrir, voltar e sai
     t.$('[data-chave="grade"]').click(); await pausa(5);
     clique(t.w, t.$('.rodape'));
     t.$('[data-chave="usuario"]').click();
-    t.$('.usuario .acao').click();
+    t.$$('.usuario .acao').find((b) => /Sair/.test(b.textContent)).click();
     await pausa(5);
     assert.deepEqual(feitos, ['registrou', 'abrir efetivo', 'inicio', 'sair']);
     assert.equal(t.idas.length, 0);
@@ -461,5 +461,47 @@ test('grade da barra usa os ícones preenchidos', async () => {
     const svg = t.$$('.ladrilho')[0].querySelector('.quadrado svg');
     assert.equal(svg.getAttribute('fill'), 'currentColor');
     assert.equal(svg.getAttribute('data-icone'), 'users');
+    t.fechar();
+});
+
+// ── v1.5: foto do usuário ────────────────────────────────
+
+const FOTO = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD';
+
+test('foto: aparece no botão do usuário e no menu; texto estranho nunca vira imagem', async () => {
+    const t = await abrir({ entrar: true, cfg: { foto: { data: FOTO, error: null } } });
+    await pausa(10);
+    assert.equal(t.$('[data-chave="usuario"] img').getAttribute('src'), FOTO);
+    t.$('[data-chave="usuario"]').click();
+    assert.equal(t.$('.usuario .cabeca img').getAttribute('src'), FOTO);
+    t.fechar();
+    const r = t.w.SGE.barra._regras;
+    assert.equal(r.fotoValida(FOTO), FOTO);
+    ['javascript:alert(1)', 'data:image/svg+xml;base64,PHN2Zz4=', 'https://x.com/a.jpg', '', null].forEach((f) => assert.equal(r.fotoValida(f), null, String(f)));
+});
+
+test('foto: sem foto mostra as iniciais; menu tem Trocar foto (só imagens)', async () => {
+    const t = await abrir({ entrar: true });
+    await pausa(10);
+    assert.equal(t.$('[data-chave="usuario"]').textContent, 'MT');
+    t.$('[data-chave="usuario"]').click();
+    const campo = t.$('.usuario input[type="file"]');
+    assert.ok(campo);
+    assert.equal(campo.getAttribute('accept'), 'image/jpeg,image/png,image/webp');
+    assert.match(t.$('.usuario').textContent, /Trocar foto/);
+    assert.doesNotMatch(t.$('.usuario').textContent, /Remover foto/);
+    t.fechar();
+});
+
+test('foto: Remover foto apaga no banco e volta às iniciais', async () => {
+    const t = await abrir({ entrar: true, cfg: { foto: { data: FOTO, error: null } } });
+    await pausa(10);
+    t.$('[data-chave="usuario"]').click();
+    const remover = t.$$('.usuario .acao').find((b) => /Remover foto/.test(b.textContent));
+    remover.click();
+    await pausa(10);
+    const chamada = t.supa.chamadas.rpc.find(([n]) => n === 'sge_salvar_minha_foto');
+    assert.deepEqual(JSON.parse(JSON.stringify(chamada[1])), { p_foto: null });
+    assert.equal(t.$('[data-chave="usuario"] img'), null);
     t.fechar();
 });

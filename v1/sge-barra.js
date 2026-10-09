@@ -93,6 +93,11 @@
         }).filter(Boolean);
     }
 
+    // Foto aceita: só imagem JPEG/PNG/WebP em data URL (nunca endereço de fora, nunca SVG), até ~200 KB.
+    function fotoValida(foto) {
+        return typeof foto === 'string' && foto.length <= 200000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(foto) ? foto : null;
+    }
+
     function iniciais(texto) {
         const partes = String(texto || '').split('@')[0].split(/[\s._-]+/).filter(Boolean);
         if (!partes.length) return '?';
@@ -202,7 +207,9 @@ p { margin: 0; }
 .busca kbd { font: inherit; font-size: 11px; padding: 1px 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.06); }
 .redondo { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.05); color: #e2e8f0; }
 .redondo:hover { background: rgba(255,255,255,.1); }
-.avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--sge-destaque, #1d4ed8); color: #fff; font-size: 12.5px; font-weight: 600; box-shadow: 0 0 0 2px rgba(255,255,255,.15); }
+.avatar { display: grid; place-items: center; width: 34px; height: 34px; overflow: hidden; border-radius: 50%; background: var(--sge-destaque, #1d4ed8); color: #fff; font-size: 12.5px; font-weight: 600; box-shadow: 0 0 0 2px rgba(255,255,255,.15); }
+.avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.acao input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .entrar { height: 34px; padding: 0 14px; border-radius: 8px; background: #fff; color: var(--sge-marca-escura, #0d1b2e); font-size: 13px; font-weight: 600; }
 .selo { min-width: 18px; padding: 0 6px; border-radius: 999px; background: var(--sge-perigo, #c62828); color: #fff; font-size: 11px; font-weight: 600; line-height: 18px; text-align: center; font-variant-numeric: tabular-nums; }
 .so-celular { display: none; }
@@ -431,7 +438,7 @@ p { margin: 0; }
 
         function cabecaUsuario(u) {
             return el('div', { classe: 'cabeca' }, [
-                el('span', { classe: 'avatar', texto: iniciais(u.nome || u.email) }),
+                el('span', { classe: 'avatar' }, [rostoDe(u)]),
                 el('div', null, [
                     el('p', { texto: u.nome || u.email }),
                     u.email && u.email !== u.nome ? el('p', { texto: u.email }) : null,
@@ -441,6 +448,20 @@ p { margin: 0; }
         }
 
         const acaoSair = () => el('button', { type: 'button', classe: 'acao', role: 'menuitem', onclick: sair }, [icone('sair', 16), 'Sair']);
+
+        // Foto (se tiver) ou as iniciais.
+        const rostoDe = (u) => (u.foto ? el('img', { src: u.foto, alt: '' }) : iniciais(u.nome || u.email));
+
+        // "Trocar foto" (escolhe uma imagem do aparelho) e, se já tem, "Remover foto".
+        function acoesFoto(u) {
+            const trocar = el('label', { classe: 'acao', role: 'menuitem' }, [
+                icone('user', 16), 'Trocar foto',
+                el('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp', 'aria-label': 'Escolher foto',
+                    onchange: (ev) => { const f = ev.target.files && ev.target.files[0]; if (f) trocarFoto(f); } }),
+            ]);
+            const remover = u.foto ? el('button', { type: 'button', classe: 'acao', role: 'menuitem', onclick: () => salvarFoto(null) }, [icone('fechar', 16), 'Remover foto']) : null;
+            return [trocar, remover];
+        }
 
         function usuarioEl() {
             const caixa = el('div', { classe: 'caixa caixa-usuario' });
@@ -453,8 +474,8 @@ p { margin: 0; }
             const aberto = est.aberto === 'usuario';
             caixa.appendChild(el('button', { type: 'button', classe: 'avatar', 'data-chave': 'usuario', 'aria-haspopup': 'menu',
                 'aria-expanded': String(aberto), 'aria-label': 'Usuário ' + (u.email || u.nome), title: u.nome || u.email,
-                texto: iniciais(u.nome || u.email), onclick: () => alternar('usuario') }));
-            if (aberto) caixa.appendChild(el('div', { classe: 'suspenso direita usuario' + animacao('usuario'), role: 'menu' }, [cabecaUsuario(u), acaoSair()]));
+                onclick: () => alternar('usuario') }, [rostoDe(u)]));
+            if (aberto) caixa.appendChild(el('div', { classe: 'suspenso direita usuario' + animacao('usuario'), role: 'menu' }, [cabecaUsuario(u), ...acoesFoto(u), acaoSair()]));
             return caixa;
         }
 
@@ -470,6 +491,7 @@ p { margin: 0; }
                 el('aside', { classe: 'gaveta' + animacao('gaveta'), role: 'dialog', 'aria-label': 'Menu' }, [
                     u ? cabecaUsuario(u) : null,
                     el('nav', null, nav),
+                    ...(u ? acoesFoto(u) : []),
                     el('button', { type: 'button', classe: 'acao', onclick: alternarTema }, [icone('tema', 18), 'Tema claro / escuro']),
                     u ? acaoSair() : el('button', { type: 'button', classe: 'acao', onclick: entrar }, [icone('user', 18), 'Entrar']),
                 ]),
@@ -577,8 +599,76 @@ p { margin: 0; }
                     est.usuario = u ? { id: u.id, nome: meta.full_name || meta.nome || u.email, email: u.email || '', papel: null } : null;
                 } catch (_) { est.usuario = null; }
             }
+            if (est.usuario) {
+                if (est.fotoDe !== est.usuario.id) { est.fotoDe = est.usuario.id; est.foto = lerFotoGuardada(est.usuario.id); buscarFoto(est.usuario.id); }
+                est.usuario.foto = est.foto;
+            }
             if (host.isConnected) desenhar();
         }
+
+        const CHAVE_FOTO = 'sge_foto:';
+        function lerFotoGuardada(id) { try { return fotoValida(sessionStorage.getItem(CHAVE_FOTO + id)); } catch (_) { return null; } }
+        function guardarFoto(id, foto) { try { if (foto) sessionStorage.setItem(CHAVE_FOTO + id, foto); else sessionStorage.removeItem(CHAVE_FOTO + id); } catch (_) { /* sem sessionStorage */ } }
+
+        function mostrarFoto(id, foto) {
+            if (!est.usuario || est.usuario.id !== id) return;
+            est.foto = foto;
+            est.usuario.foto = foto;
+            guardarFoto(id, foto);
+            if (host.isConnected) desenhar();
+        }
+
+        async function buscarFoto(id) {
+            try {
+                const { data, error } = await core.acesso.conexao().rpc('sge_minha_foto');
+                if (!error) mostrarFoto(id, fotoValida(data));
+            } catch (_) { /* sem foto: ficam as iniciais */ }
+        }
+
+        // Diminui para 160 x 160 (corte no meio) e guarda como JPEG: leve e igual em todos os sistemas.
+        function reduzirFoto(arquivo) {
+            return new Promise((ok, falha) => {
+                const leitor = new FileReader();
+                leitor.onerror = () => falha(new Error('leitura'));
+                leitor.onload = () => {
+                    const img = new Image();
+                    img.onerror = () => falha(new Error('imagem'));
+                    img.onload = () => {
+                        const L = 160;
+                        const tela = document.createElement('canvas');
+                        tela.width = L; tela.height = L;
+                        const lado = Math.min(img.naturalWidth, img.naturalHeight);
+                        tela.getContext('2d').drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, L, L);
+                        ok(tela.toDataURL('image/jpeg', 0.85));
+                    };
+                    img.src = leitor.result;
+                };
+                leitor.readAsDataURL(arquivo);
+            });
+        }
+
+        async function trocarFoto(arquivo) {
+            try { await salvarFoto(await reduzirFoto(arquivo)); } catch (_) { core.aviso('Essa imagem não abriu. Use uma foto JPG ou PNG.', 'erro'); }
+        }
+
+        async function salvarFoto(foto) {
+            const u = est.usuario;
+            if (!u) return;
+            try {
+                const { error } = await core.acesso.conexao().rpc('sge_salvar_minha_foto', { p_foto: foto });
+                if (error) throw error;
+            } catch (e) {
+                console.warn('[SGE] Barra: não consegui salvar a foto.', e);
+                core.aviso('Não consegui salvar a foto. Tente de novo.', 'erro');
+                return;
+            }
+            mostrarFoto(u.id, foto);
+            if (canal) canal.postMessage({ tipo: 'foto', id: u.id, foto });
+        }
+
+        // Outras barras abertas (outros sistemas no portal) trocam a foto na hora.
+        const canal = typeof BroadcastChannel === 'function' ? new BroadcastChannel('sge-barra') : null;
+        if (canal) canal.onmessage = (ev) => { const m = ev.data || {}; if (m.tipo === 'foto') mostrarFoto(m.id, fotoValida(m.foto)); };
 
         function alternarTema() {
             const novo = temaEscuro() ? 'claro' : 'escuro';
@@ -644,6 +734,7 @@ p { margin: 0; }
                 window.removeEventListener('popstate', desenhar);
                 window.removeEventListener('hashchange', desenhar);
                 window.removeEventListener('scroll', rolagem);
+                if (canal) canal.close();
                 host.remove();
                 if (instancia === api) instancia = null;
             },
@@ -653,13 +744,13 @@ p { margin: 0; }
     }
 
     SGE.barra = {
-        versao: '1.4.0',
+        versao: '1.5.0',
         // Portal SGE na página de cima (mesmo endereço); fora dele, ou em outro endereço, devolve null.
         _acharPortal() {
             try { return window.top !== window && window.top.SGEPortal ? window.top.SGEPortal : null; } catch (_) { return null; }
         },
         montar,
-        _regras: { enderecoNoPortal, agruparPorArea, prepararSistemas, telaAtual, secoesVisiveis, iniciais },
+        _regras: { enderecoNoPortal, agruparPorArea, prepararSistemas, telaAtual, secoesVisiveis, iniciais, fotoValida },
     };
     if (window.SGECore) window.SGECore.barra = SGE.barra;
 })();

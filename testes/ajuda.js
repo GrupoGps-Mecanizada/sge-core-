@@ -32,6 +32,8 @@ function supabaseFalso(cfg = {}) {
         rpc: async (nome, args) => {
             chamadas.rpc.push([nome, args]);
             if (nome === 'sge_meus_sistemas') return resp(cfg.sistemas, { data: { ativo: true, nome: 'Maria Teste', sistemas: [] }, error: null });
+            if (nome === 'sge_minha_foto') return resp(cfg.foto, { data: null, error: null });
+            if (nome === 'sge_salvar_minha_foto') return resp(cfg.salvarFoto, { data: null, error: null });
             return resp(cfg.perm, { data: PERM_OK, error: null });
         },
         from: (tabela) => {

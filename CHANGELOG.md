@@ -1,5 +1,8 @@
 # Mudanças do SGE Core
 
+## v1.5.0 · 2026-10-09
+- **Foto do usuário** na Barra Universal: menu do usuário com "Trocar foto" (reduz para 160 px) e "Remover foto"; a foto fica no cadastro da Central (`sge_minha_foto` / `sge_salvar_minha_foto`) e aparece em todos os sistemas que usam a barra; as barras abertas trocam na hora. Só aceita JPEG/PNG/WebP. Testes: 75.
+
 ## v1.4.1 · 2026-10-09
 - Capacete (SST) também preenchido.
 
