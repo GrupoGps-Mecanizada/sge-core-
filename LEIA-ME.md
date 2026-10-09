@@ -93,7 +93,7 @@ A mesma barra de topo em todos os sistemas: logo SGE (abre a grade com os sistem
 - Sistema que troca de tela sem recarregar (React/Next, `history.pushState`): chame `barra.atualizar()` a cada troca de tela (no Next: num `useEffect` com o `usePathname()`), e monte a barra só depois que a página carregar (`useEffect`).
 - `tela` no item = só aparece para quem tem essa tela liberada. `barra.contador(href, n)` põe um número ao lado (0 esconde).
 - O visual fica isolado (Shadow DOM): o CSS do sistema não estraga a barra. Deixe o `<body>` sem margem (`margin: 0`) para a barra encostar nas bordas.
-- Ícones: `SGE.icone('truck', 20)` e a lista em `SGE.icones`. Ícone e cor de cada sistema vêm da tela de Sistemas da Central.
+- Ícones: `SGE.icone('truck', 20)` e a lista em `SGE.icones`. O ícone de cada sistema vem da tela de Sistemas da Central (todos no mesmo tom neutro).
 - Teste visual: `teste-barra.html` (dados de exemplo; `?abrir=grade` abre a grade).
 
 ## Versões

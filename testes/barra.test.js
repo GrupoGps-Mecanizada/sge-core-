@@ -19,7 +19,7 @@ test('ícones: conhecido, desconhecido e apelido', () => {
     fechar();
 });
 
-test('regras: endereço, cor, tela ativa, iniciais', () => {
+test('regras: endereço, tela ativa, iniciais', () => {
     const { w, fechar } = montar({ extras: ['sge-icones.js', 'sge-barra.js'] });
     const r = w.SGE.barra._regras;
     assert.equal(r.enderecoNoPortal('https://grupogps-mecanizada.github.io/Gest-o-Efetivo/?a=1'), '/Gest-o-Efetivo/?a=1');
@@ -27,8 +27,6 @@ test('regras: endereço, cor, tela ativa, iniciais', () => {
     assert.equal(r.enderecoNoPortal('https://outro.web.app/x'), 'https://outro.web.app/x');
     ['javascript:alert(1)', '//mal.com/', '/\\mal.com', 'https://a.com/\u0000', '', null]
         .forEach((u) => assert.equal(r.enderecoNoPortal(u), null, String(u)));
-    assert.equal(r.corValida('#15803D'), '#15803D');
-    ['vermelho', '#fff', 'url(x)', null].forEach((c) => assert.equal(r.corValida(c), null, String(c)));
     const secoes = [{ href: '/sst/' }, { itens: [{ href: '/sst/matriz' }, { href: '/sst/matriz-velha' }] }];
     assert.equal(r.telaAtual(secoes, '/sst/matriz'), '/sst/matriz');
     assert.equal(r.telaAtual(secoes, '/sst/matriz/123'), '/sst/matriz');
@@ -141,7 +139,8 @@ test('grade: agrupa por área, marca o atual, endereços seguros, abre fora em n
     assert.equal(lad[1].getAttribute('rel'), 'noopener');
     assert.equal(lad[1].querySelector('svg').getAttribute('data-icone'), 'grade');
     assert.equal(lad[2].getAttribute('aria-current'), 'page');
-    assert.equal(lad[2].querySelector('.quadrado').style.getPropertyValue('--cor'), '#15803d');
+    // Ícones neutros (sem a cor de cada sistema): nada de estilo próprio no quadrado.
+    assert.equal(lad[2].querySelector('.quadrado').getAttribute('style'), null);
     assert.equal(t.$('.rodape').getAttribute('href'), 'https://sge-portal.pages.dev/');
     t.fechar();
 });

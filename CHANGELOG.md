@@ -5,6 +5,7 @@
 - Novo `sge-barra.js`: `SGE.barra.montar({...})` — barra de topo universal (logo SGE com a grade de sistemas, menus do sistema com permissão por tela, busca Ctrl+K, tema claro/escuro, usuário e Sair; gaveta no celular). Estilo isolado (Shadow DOM). Marca a tela atual por caminho ou por `#`.
 - `SGE.acesso.conexao()`: a conexão da Central (usada pela barra).
 - Página de demonstração `teste-barra.html` (dados de exemplo). Testes: 65.
+- Ícones da grade neutros (cinza; azul no sistema atual e ao passar o mouse), sem a cor de cada sistema — pedido do Warlison.
 - Revisão final: a fonte do sistema não entra na barra; redesenhar com painel aberto não perde a busca, o foco nem a rolagem; no tablet (até 1100 px) os menus viram só ícones; tela ativa acompanha SPA; lista de sistemas guardada por usuário; toque fora fecha no iPad.
 
 ## v1.1.1 · 2026-10-08

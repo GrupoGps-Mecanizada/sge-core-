@@ -67,7 +67,7 @@ barra.destruir();
 - Altura 62 px (computador) / 56 px (celular), fixa no topo (`position: sticky`).
 - Fundo `--sge-marca-escura`, textos claros, botões arredondados 8 px, menu do meio numa "cápsula" translúcida (igual SST). Submenus e grade em cartão claro (`--sge-superficie`), sombra forte, raio 12 px.
 - **Shadow DOM** (estilo isolado): o CSS do sistema não entra na barra e o da barra não vaza. Usa as variáveis `--sge-*` quando o sistema carrega `sge-core.css`; senão, valores padrão iguais aos do sge-core.
-- **Grade de sistemas** (painel de ~380 px abaixo do logo): grupos por `area_menu` (ordem: `ordem`, depois nome); cada sistema = quadrado 56 px, raio 14 px, fundo na `cor` do sistema com leve degradê, ícone branco 26 px, nome embaixo (2 linhas no máximo). Sistema atual com anel. Rodapé: "Página inicial do SGE" (portal). Carregando: quadrados cinza piscando. Erro: "Não consegui carregar seus sistemas" + Tentar de novo.
+- **Grade de sistemas** (painel de ~380 px abaixo do logo): grupos por `area_menu` (ordem: `ordem`, depois nome); cada sistema = quadrado 52 px, raio 14 px, fundo claro neutro com borda fina e ícone cinza 24 px (azul de destaque ao passar o mouse e no sistema atual), nome embaixo (2 linhas no máximo). **Sem cor por sistema** (decisão do Warlison em 2026-10-09). Rodapé: "Página inicial do SGE" (portal). Carregando: quadrados cinza piscando. Erro: "Não consegui carregar seus sistemas" + Tentar de novo.
 - **Celular (< 768 px):** logo (abre a grade), nome do sistema + tela atual, busca e ☰. O ☰ abre uma gaveta à direita com os menus, o usuário e Sair.
 - Acessibilidade: botões com `aria-expanded`/`aria-haspopup`, Esc fecha, clique fora fecha, foco volta ao botão, alvos de toque ≥ 44 px no celular, respeita "reduzir movimento".
 

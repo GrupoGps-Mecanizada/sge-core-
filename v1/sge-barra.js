@@ -37,10 +37,6 @@
         return u.toString();
     }
 
-    function corValida(cor) {
-        return typeof cor === 'string' && /^#[0-9a-f]{6}$/i.test(cor.trim()) ? cor.trim() : null;
-    }
-
     function comparar(a, b) {
         const oa = a.ordem == null ? Infinity : a.ordem;
         const ob = b.ordem == null ? Infinity : b.ordem;
@@ -215,9 +211,9 @@ p { margin: 0; }
 .ladrilhos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
 .ladrilho { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 4px 10px; border-radius: 10px; text-align: center; }
 .ladrilho:hover { background: var(--sge-superficie-2, #f5f7fb); }
-.quadrado { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; color: #fff; background-color: var(--cor); background-image: linear-gradient(145deg, rgba(255,255,255,.22), rgba(255,255,255,0) 60%); box-shadow: 0 1px 2px rgba(15,23,42,.18), inset 0 1px 0 rgba(255,255,255,.25); transition: transform .15s; }
-.ladrilho:hover .quadrado { transform: translateY(-2px); }
-.ladrilho[aria-current="page"] .quadrado { box-shadow: 0 0 0 2px var(--sge-superficie, #fff), 0 0 0 4px var(--cor); }
+.quadrado { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; color: var(--sge-texto-2, #4b5563); background: var(--sge-superficie-2, #f5f7fb); border: 1px solid var(--sge-borda, #e1e6ef); transition: transform .15s, color .15s, border-color .15s; }
+.ladrilho:hover .quadrado { transform: translateY(-2px); color: var(--sge-destaque, #1d4ed8); border-color: var(--sge-destaque, #1d4ed8); }
+.ladrilho[aria-current="page"] .quadrado { color: var(--sge-destaque, #1d4ed8); border-color: var(--sge-destaque, #1d4ed8); background: var(--sge-destaque-suave, #1d4ed814); }
 .nome-sis { font-size: 12.5px; line-height: 1.25; color: var(--sge-texto, #111827); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .fora { position: absolute; top: 6px; right: 8px; color: var(--sge-texto-3, #6b7280); }
 .fantasma { height: 86px; border-radius: 10px; background: var(--sge-superficie-2, #f5f7fb); animation: piscar 1.2s ease-in-out infinite; }
@@ -347,8 +343,7 @@ p { margin: 0; }
         }
 
         function ladrilho(s) {
-            const quadrado = el('span', { classe: 'quadrado' }, [icone(s.icone, 26)]);
-            quadrado.style.setProperty('--cor', corValida(s.cor) || 'var(--sge-marca, #1B3A6B)');
+            const quadrado = el('span', { classe: 'quadrado' }, [icone(s.icone, 24)]);
             return el('a', {
                 classe: 'ladrilho', href: s.endereco, title: s.nome,
                 target: s.abre_fora ? '_blank' : null, rel: s.abre_fora ? 'noopener' : null,
@@ -614,7 +609,7 @@ p { margin: 0; }
     SGE.barra = {
         versao: '1.2.0',
         montar,
-        _regras: { enderecoNoPortal, corValida, agruparPorArea, prepararSistemas, telaAtual, secoesVisiveis, iniciais },
+        _regras: { enderecoNoPortal, agruparPorArea, prepararSistemas, telaAtual, secoesVisiveis, iniciais },
     };
     if (window.SGECore) window.SGECore.barra = SGE.barra;
 })();
