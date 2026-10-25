@@ -430,6 +430,19 @@ test('logo só volta para o início (não abre a lista); no portal, barra clara 
     t.fechar();
 });
 
+test('tema: sem escolha é claro; no portal com tema escuro a barra fica escura e troca junto com outra página', async () => {
+    const portal = { abrir() {}, inicio() {}, sair() {}, entrar() {}, registrarBarra() {} };
+    const t = await abrir({ antesDeMontar: (w) => { w.SGE.barra._acharPortal = () => portal; } });
+    assert.equal(t.w.document.documentElement.getAttribute('data-tema'), 'claro');
+    assert.ok(t.$('.barra').classList.contains('clara'));
+    t.w.localStorage.setItem('sge_tema', 'escuro');
+    t.w.dispatchEvent(new t.w.StorageEvent('storage', { key: 'sge_tema', newValue: 'escuro' }));
+    assert.equal(t.w.document.documentElement.getAttribute('data-tema'), 'escuro');
+    assert.ok(!t.$('.barra').classList.contains('clara'));
+    assert.ok(!/recortado/.test(t.$('.logo img').getAttribute('src')));
+    t.fechar();
+});
+
 test('fora do portal: barra continua escura e o logo leva à página inicial', async () => {
     const t = await abrir();
     assert.ok(!t.$('.barra').classList.contains('clara'));

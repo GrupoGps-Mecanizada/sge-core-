@@ -157,11 +157,16 @@
         if (t) return t === 'escuro';
         return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
-    function aplicarTemaGuardado() {
+    // Um tema só para o portal e os sistemas (mesma chave no navegador). Sem escolha: sempre claro.
+    function temaGuardado() {
         try {
             const t = localStorage.getItem(CHAVE_TEMA);
-            if (t === 'claro' || t === 'escuro') document.documentElement.setAttribute('data-tema', t);
-        } catch (_) { /* sem localStorage: segue o tema do aparelho */ }
+            if (t === 'claro' || t === 'escuro') return t;
+        } catch (_) { /* sem localStorage: claro */ }
+        return 'claro';
+    }
+    function aplicarTemaGuardado() {
+        document.documentElement.setAttribute('data-tema', temaGuardado());
     }
 
     const CSS = `
@@ -522,12 +527,14 @@ p { margin: 0; }
             visiveis.forEach((s) => [s].concat(s.itens || []).forEach((i) => { if (i.href === atual) rotuloAtual = i.rotulo; }));
             host.classList.toggle('transparente', !!op.transparente);
             const vidro = op.transparente ? (est.rolou ? ' fosco' : ' vidro') : '';
-            const barra = el('header', { classe: 'barra' + vidro + (op.clara ? ' clara' : '') }, [
+            // Clara (portal) só no tema claro; no escuro a barra volta a ser a escura de sempre.
+            const clara = op.clara && !temaEscuro();
+            const barra = el('header', { classe: 'barra' + vidro + (clara ? ' clara' : '') }, [
                 el('div', { classe: 'caixa' }, [
                     // Logo: só volta para o início (a lista de sistemas abre pela busca / Ctrl K).
                     el('a', { classe: 'logo', href: location.origin + '/', 'aria-label': 'Início do SGE', title: 'Início do SGE',
                         onclick: (ev) => { fechar(); if (op.aoIrInicio && simples(ev)) { ev.preventDefault(); op.aoIrInicio(ev); } } },
-                    [el('img', { src: core.logo(op.clara ? 'recortado' : ''), alt: '' })]),
+                    [el('img', { src: core.logo(clara ? 'recortado' : ''), alt: '' })]),
                     est.aberto === 'grade' ? (gradeAberta || gradeEl()) : null,
                 ]),
                 el('a', { classe: 'nome', href: op.inicio || location.pathname, onclick: (ev) => navegar(ev, op.inicio || location.pathname) }, [
@@ -727,6 +734,14 @@ p { margin: 0; }
         aplicarTemaGuardado();
         desenhar();
         carregarUsuario();
+        // Tema trocado em outra página do mesmo endereço (o portal ou um sistema aberto nele): segue junto.
+        function temaDeFora(ev) {
+            if (ev.key !== CHAVE_TEMA) return;
+            aplicarTemaGuardado();
+            window.dispatchEvent(new CustomEvent('sge:tema', { detail: { tema: temaGuardado() } }));
+            desenhar();
+        }
+        window.addEventListener('storage', temaDeFora);
 
         const api = {
             host,
@@ -741,6 +756,7 @@ p { margin: 0; }
                 window.removeEventListener('popstate', desenhar);
                 window.removeEventListener('hashchange', desenhar);
                 window.removeEventListener('scroll', rolagem);
+                window.removeEventListener('storage', temaDeFora);
                 if (canal) canal.close();
                 host.remove();
                 if (instancia === api) instancia = null;

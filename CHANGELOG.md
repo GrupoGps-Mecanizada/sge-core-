@@ -1,5 +1,10 @@
 # Mudanças do SGE Core
 
+## v1.7.0 · 2026-10-25
+- **Um tema só**: a chave `sge_tema` vale para o portal e todos os sistemas abertos nele; trocar o tema numa barra troca as outras páginas do mesmo endereço na hora (evento `storage`). **Sem escolha, sempre claro** (não segue mais o tema do aparelho).
+- Barra `clara` só no tema claro: no escuro volta a ser a barra escura (com o logo na caixa branca).
+- Testes: 1 novo.
+
 ## v1.6.0 · 2026-10-25
 - **Logo da barra só volta para o início**: não abre mais a lista de sistemas (ela continua na busca / Ctrl K). Dentro do portal, volta para a tela inicial do portal.
 - **Dentro do Portal SGE, a barra dos sistemas fica clara, na cor do portal** (azul ardósia): SST, Monitoramento e Gestão de Efetivo ficam iguais à barra do portal. Fora do portal, nada muda.
