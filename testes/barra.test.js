@@ -129,7 +129,7 @@ test('clique fora fecha', async () => {
 
 test('grade: agrupa por área, marca o atual, endereços seguros, abre fora em nova aba', async () => {
     const t = await abrir();
-    t.$('[data-chave="grade"]').click();
+    t.$('[data-chave="busca"]').click();
     await pausa(5);
     assert.deepEqual(t.$$('.grade .area').map((a) => a.textContent), ['Pessoal', 'Segurança']);
     const lad = t.$$('.ladrilho');
@@ -148,9 +148,9 @@ test('grade: agrupa por área, marca o atual, endereços seguros, abre fora em n
 
 test('grade: guarda a lista por 5 minutos (uma consulta só)', async () => {
     const t = await abrir();
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     tecla(t.w, { key: 'Escape' });
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     assert.equal(sistemasRpc(t.supa), 1);
     assert.equal(t.$$('.ladrilho').length, 3);
     t.fechar();
@@ -159,7 +159,7 @@ test('grade: guarda a lista por 5 minutos (uma consulta só)', async () => {
 test('grade: erro mostra Tentar de novo, que consulta de novo', async () => {
     let vez = 0;
     const t = await abrir({ cfg: { sistemas: () => (++vez === 1 ? { data: null, error: { message: 'Failed to fetch' } } : { data: { ativo: true, sistemas: SISTEMAS }, error: null }) } });
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     assert.match(t.$('.grade').textContent, /Não consegui carregar seus sistemas/);
     t.$('.vazio button').click(); await pausa(5);
     assert.equal(t.$$('.ladrilho').length, 3);
@@ -169,7 +169,7 @@ test('grade: erro mostra Tentar de novo, que consulta de novo', async () => {
 
 test('grade: busca sem acento filtra e o campo não é recriado', async () => {
     const t = await abrir();
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     const campo = t.$('[data-chave="busca-grade"]');
     campo.value = 'GESTAO';
     campo.dispatchEvent(new t.w.Event('input', { bubbles: true }));
@@ -243,7 +243,7 @@ test('sem sessão: mostra Entrar, que leva ao login', async () => {
 test('texto vindo de fora nunca vira HTML', async () => {
     const perigo = '<img src=x onerror=alert(1)>';
     const t = await abrir({ opcoes: { nome: perigo, area: perigo }, cfg: { sistemas: { data: { ativo: true, sistemas: [{ slug: 'x', nome: perigo, area_menu: perigo, url_origem: '/x/' }] }, error: null } } });
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     assert.equal(t.$$('img').length, 1); // só o logo
     assert.match(t.$('.nome').textContent, /<img src=x/);
     assert.match(t.$('.ladrilho').textContent, /<img src=x/);
@@ -301,7 +301,7 @@ test('revisão: tipografia própria (fonte do sistema não entra) e rótulos esc
 
 test('revisão: redesenhar com a grade aberta não recria a busca nem perde o texto', async () => {
     const t = await abrir();
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     const campo = t.$('[data-chave="busca-grade"]');
     campo.value = 'efe';
     campo.dispatchEvent(new t.w.Event('input', { bubbles: true }));
@@ -345,7 +345,7 @@ test('revisão: lista guardada é de cada usuário (não mostra a lista de outra
     } });
     const barra = m.w.SGE.barra.montar({ sistema: 'sst', nome: 'SST' });
     await pausa(5);
-    barra.host.shadowRoot.querySelector('[data-chave="grade"]').click(); await pausa(5);
+    barra.host.shadowRoot.querySelector('[data-chave="busca"]').click(); await pausa(5);
     assert.equal(sistemasRpc(supa), 1);
     assert.doesNotMatch(barra.host.shadowRoot.querySelector('.lista-grade').textContent, /De outra pessoa/);
     m.fechar();
@@ -389,13 +389,13 @@ test('transparente: fixa no topo e ganha fundo ao rolar', async () => {
 test('aoAbrirSistema e aoIrInicio: a grade avisa em vez de navegar (abre fora continua normal)', async () => {
     const feitos = [];
     const t = await abrir({ opcoes: { aoAbrirSistema: (slug) => feitos.push('abrir ' + slug), aoIrInicio: () => feitos.push('inicio') } });
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     const ev = clique(t.w, ladrilhoDe(t, '/Gest-o-Efetivo/'));
     assert.equal(ev.defaultPrevented, true);
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     const fora = clique(t.w, ladrilhoDe(t, 'https://outro.web.app/'));
     assert.equal(fora.defaultPrevented, false);
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     clique(t.w, t.$('.rodape'));
     assert.deepEqual(feitos, ['abrir efetivo', 'inicio']);
     t.fechar();
@@ -405,15 +405,35 @@ test('dentro do portal: registra a barra e usa o portal para abrir, voltar e sai
     const feitos = [];
     const portal = { abrir: (s) => feitos.push('abrir ' + s), inicio: () => feitos.push('inicio'), sair: () => feitos.push('sair'), entrar: () => feitos.push('entrar'), registrarBarra: (w) => feitos.push(w ? 'registrou' : 'sem janela') };
     const t = await abrir({ entrar: true, antesDeMontar: (w) => { w.SGE.barra._acharPortal = () => portal; } });
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     clique(t.w, ladrilhoDe(t, '/Gest-o-Efetivo/'));
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     clique(t.w, t.$('.rodape'));
     t.$('[data-chave="usuario"]').click();
     t.$$('.usuario .acao').find((b) => /Sair/.test(b.textContent)).click();
     await pausa(5);
     assert.deepEqual(feitos, ['registrou', 'abrir efetivo', 'inicio', 'sair']);
     assert.equal(t.idas.length, 0);
+    t.fechar();
+});
+
+test('logo só volta para o início (não abre a lista); no portal, barra clara na cor do portal', async () => {
+    const feitos = [];
+    const portal = { abrir() {}, inicio: () => feitos.push('inicio'), sair() {}, entrar() {}, registrarBarra() {} };
+    const t = await abrir({ antesDeMontar: (w) => { w.SGE.barra._acharPortal = () => portal; } });
+    assert.equal(t.$('.logo').tagName, 'A');
+    clique(t.w, t.$('.logo'));
+    assert.deepEqual(feitos, ['inicio']);
+    assert.equal(t.$('.grade'), null);
+    assert.ok(t.$('.barra').classList.contains('clara'));
+    assert.equal(t.barra.host.style.getPropertyValue('--sge-barra-clara-fundo'), '#dbe3ed');
+    t.fechar();
+});
+
+test('fora do portal: barra continua escura e o logo leva à página inicial', async () => {
+    const t = await abrir();
+    assert.ok(!t.$('.barra').classList.contains('clara'));
+    assert.equal(t.$('.logo').getAttribute('href'), 'https://sge-portal.pages.dev/');
     t.fechar();
 });
 
@@ -457,7 +477,7 @@ test('barra clara: para páginas de fundo claro', async () => {
 
 test('grade da barra usa os ícones preenchidos', async () => {
     const t = await abrir();
-    t.$('[data-chave="grade"]').click(); await pausa(5);
+    t.$('[data-chave="busca"]').click(); await pausa(5);
     const svg = t.$$('.ladrilho')[0].querySelector('.quadrado svg');
     assert.equal(svg.getAttribute('fill'), 'currentColor');
     assert.equal(svg.getAttribute('data-icone'), 'users');

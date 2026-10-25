@@ -1,5 +1,11 @@
 # Mudanças do SGE Core
 
+## v1.6.0 · 2026-10-25
+- **Logo da barra só volta para o início**: não abre mais a lista de sistemas (ela continua na busca / Ctrl K). Dentro do portal, volta para a tela inicial do portal.
+- **Dentro do Portal SGE, a barra dos sistemas fica clara, na cor do portal** (azul ardósia): SST, Monitoramento e Gestão de Efetivo ficam iguais à barra do portal. Fora do portal, nada muda.
+- **Barra clara sem a caixa branca do logo**: só o desenho do SGE (arquivo novo `assets/sge-logo-recortado.svg`, sem sobras) ocupando a caixa do logo.
+- Testes: 2 novos; os testes da lista de sistemas abrem pela busca.
+
 ## v1.5.1 · 2026-10-25
 - Barra `clara`: a página pode trocar a cor de fundo e da linha de baixo pelas variáveis CSS `--sge-barra-clara-fundo` e `--sge-barra-clara-linha` (sem elas, fica igual). Usado pelo Portal SGE (azul ardósia).
 

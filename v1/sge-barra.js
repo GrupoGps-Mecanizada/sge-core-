@@ -20,6 +20,8 @@
     const CACHE_MS = 5 * 60 * 1000;
     const CHAVE_TEMA = 'sge_tema';
     const OUTROS = 'Outros';
+    // Cor da barra dentro do Portal SGE (azul ardósia, a mesma das barras do portal).
+    const COR_NO_PORTAL = { '--sge-barra-clara-fundo': '#dbe3ed', '--sge-barra-clara-linha': '#c2cedd' };
     const PROIBIDOS = /[\\\x00-\x1f\x7f]/;
 
     // ── Regras (sem tela; testadas em barra.test.js) ─────────
@@ -177,7 +179,9 @@ p { margin: 0; }
 .barra.clara { background: var(--sge-barra-clara-fundo, rgba(255,255,255,.78)); color: #0f172a; border-bottom-color: var(--sge-barra-clara-linha, rgba(15,23,42,.07)); box-shadow: none; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 .barra.clara .nome strong { color: #0f172a; }
 .barra.clara .nome .sub, .barra.clara .nome .tela { color: #64748b; }
-.barra.clara .logo { box-shadow: 0 0 0 1px rgba(15,23,42,.08); }
+/* Barra clara: só o desenho do SGE ocupando a caixa do logo, sem fundo branco */
+.barra.clara .logo, .barra.clara .logo:hover { background: none; box-shadow: none; border-radius: 0; }
+.barra.clara .logo img { width: 100%; height: 100%; object-fit: contain; }
 .barra.clara .busca, .barra.clara .redondo { border-color: rgba(15,23,42,.1); background: #ffffff; color: #475569; }
 .barra.clara .busca:hover, .barra.clara .redondo:hover { background: #f8fafc; color: #0f172a; }
 .barra.clara .busca kbd { border-color: rgba(15,23,42,.12); background: #f1f5f9; }
@@ -305,8 +309,10 @@ p { margin: 0; }
             op.aoSair = op.aoSair || (() => portal.sair());
             op.aoEntrar = op.aoEntrar || (() => portal.entrar());
             try { portal.registrarBarra(window); } catch (_) { /* portal antigo: segue sem avisar */ } // o portal esconde a barra dele
+            op.clara = true; // no portal, a barra do sistema fica igual à do portal
         }
         const host = document.createElement('sge-barra');
+        if (portal) Object.entries(COR_NO_PORTAL).forEach(([k, v]) => host.style.setProperty(k, v));
         const raiz = host.attachShadow({ mode: 'open' });
         const alvo = op.alvo || document.body;
         alvo.insertBefore(host, alvo.firstChild);
@@ -518,9 +524,10 @@ p { margin: 0; }
             const vidro = op.transparente ? (est.rolou ? ' fosco' : ' vidro') : '';
             const barra = el('header', { classe: 'barra' + vidro + (op.clara ? ' clara' : '') }, [
                 el('div', { classe: 'caixa' }, [
-                    el('button', { type: 'button', classe: 'logo', 'data-chave': 'grade', 'aria-haspopup': 'dialog',
-                        'aria-expanded': String(est.aberto === 'grade'), 'aria-label': 'Sistemas do SGE', title: 'Sistemas do SGE',
-                        onclick: () => alternar('grade') }, [el('img', { src: core.logo(), alt: '' })]),
+                    // Logo: só volta para o início (a lista de sistemas abre pela busca / Ctrl K).
+                    el('a', { classe: 'logo', href: location.origin + '/', 'aria-label': 'Início do SGE', title: 'Início do SGE',
+                        onclick: (ev) => { fechar(); if (op.aoIrInicio && simples(ev)) { ev.preventDefault(); op.aoIrInicio(ev); } } },
+                    [el('img', { src: core.logo(op.clara ? 'recortado' : ''), alt: '' })]),
                     est.aberto === 'grade' ? (gradeAberta || gradeEl()) : null,
                 ]),
                 el('a', { classe: 'nome', href: op.inicio || location.pathname, onclick: (ev) => navegar(ev, op.inicio || location.pathname) }, [
