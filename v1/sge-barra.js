@@ -174,7 +174,7 @@ p { margin: 0; }
 .barra { display: flex; align-items: center; gap: 12px; height: 62px; padding: 0 20px; background: var(--sge-marca-escura, #0d1b2e); color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,.08); box-shadow: 0 6px 16px -8px rgba(0,0,0,.5); transition: background .25s, box-shadow .25s, border-color .25s; }
 :host(.transparente) { position: fixed; top: 0; left: 0; right: 0; }
 .barra.vidro { background: transparent; border-bottom-color: transparent; box-shadow: none; }
-.barra.clara { background: rgba(255,255,255,.78); color: #0f172a; border-bottom-color: rgba(15,23,42,.07); box-shadow: none; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.barra.clara { background: var(--sge-barra-clara-fundo, rgba(255,255,255,.78)); color: #0f172a; border-bottom-color: var(--sge-barra-clara-linha, rgba(15,23,42,.07)); box-shadow: none; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 .barra.clara .nome strong { color: #0f172a; }
 .barra.clara .nome .sub, .barra.clara .nome .tela { color: #64748b; }
 .barra.clara .logo { box-shadow: 0 0 0 1px rgba(15,23,42,.08); }
