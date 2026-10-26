@@ -1,5 +1,8 @@
 # Mudanças do SGE Core
 
+## v1.9.1 · 2026-10-26
+- A trilha "Portal / Grupo GPS / Mecanizada" saiu dos sistemas abertos no portal (o dono não gostou): a barra volta a mostrar só o logo e o nome do sistema. A opção `trilha` continua existindo, mas só aparece se o sistema pedir.
+
 ## v1.9.0 · 2026-10-26
 - **Menu da barra só com ícones**: o nome de cada item (e a setinha do submenu) abre ao lado do ícone ao passar o mouse, focar ou abrir o submenu, como a barra lateral do portal. Pedido do Warlison.
 

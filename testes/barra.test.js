@@ -455,13 +455,6 @@ test('trilha: mostra o caminho como pasta (Portal / Grupo GPS / Mecanizada / Sis
     t.fechar();
 });
 
-test('trilha: dentro do portal, sistema sem trilha própria ganha a do portal com o próprio nome', async () => {
-    const portal = { abrir() {}, inicio() {}, sair() {}, entrar() {}, registrarBarra() {} };
-    const t = await abrir({ antesDeMontar: (w) => { w.SGE.barra._acharPortal = () => portal; } });
-    assert.deepEqual(t.$$('.trilha .pedaco').map((p) => p.textContent), ['Portal', 'Grupo GPS', 'Mecanizada', 'SST']);
-    t.fechar();
-});
-
 test('fora do portal: barra continua escura e o logo leva à página inicial', async () => {
     const t = await abrir();
     assert.ok(!t.$('.barra').classList.contains('clara'));

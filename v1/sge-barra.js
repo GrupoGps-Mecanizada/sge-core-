@@ -20,8 +20,6 @@
     const CACHE_MS = 5 * 60 * 1000;
     const CHAVE_TEMA = 'sge_tema';
     const OUTROS = 'Outros';
-    // Começo da trilha mostrada no portal (e nos sistemas abertos dentro dele).
-    const TRILHA_PORTAL = ['Portal', 'Grupo GPS', 'Mecanizada'];
     // Cor da barra dentro do Portal SGE (azul ardósia, a mesma das barras do portal).
     const COR_NO_PORTAL = { '--sge-barra-clara-fundo': '#dbe3ed', '--sge-barra-clara-linha': '#c2cedd' };
     const PROIBIDOS = /[\\\x00-\x1f\x7f]/;
@@ -448,10 +446,9 @@ p { margin: 0; }
         }
 
         // Trilha "Portal / Grupo GPS / Mecanizada / Sistema", como o caminho de uma pasta no computador: mostra onde a pessoa está.
-        // O primeiro pedaço ("Portal") volta ao início; o último fica em destaque. Dentro do portal, sistemas sem trilha própria
-        // ganham a do portal com o próprio nome no fim.
+        // O primeiro pedaço ("Portal") volta ao início; o último fica em destaque. Só aparece se o sistema pedir (opção trilha).
         function trilhaEl() {
-            const pedacos = Array.isArray(op.trilha) ? op.trilha : (op.dentroDoPortal ? TRILHA_PORTAL.concat(op.nome ? [op.nome] : []) : null);
+            const pedacos = Array.isArray(op.trilha) ? op.trilha : null;
             if (!pedacos || !pedacos.length) return null;
             const filhos = [];
             pedacos.forEach((texto, i) => {
