@@ -443,6 +443,25 @@ test('tema: sem escolha é claro; no portal com tema escuro a barra fica escura 
     t.fechar();
 });
 
+test('trilha: mostra o caminho como pasta (Portal / Grupo GPS / Mecanizada / Sistema), Portal volta ao início', async () => {
+    const feitos = [];
+    const t = await abrir({ opcoes: { trilha: ['Portal', 'Grupo GPS', 'Mecanizada', 'SST'], aoIrInicio: () => feitos.push('inicio') } });
+    assert.deepEqual(t.$$('.trilha .pedaco').map((p) => p.textContent), ['Portal', 'Grupo GPS', 'Mecanizada', 'SST']);
+    assert.equal(t.$$('.trilha .sep').length, 3);
+    assert.equal(t.$('.trilha .atual').textContent, 'SST');
+    assert.equal(t.$('.nome'), null);
+    clique(t.w, t.$('.trilha a.inicio'));
+    assert.deepEqual(feitos, ['inicio']);
+    t.fechar();
+});
+
+test('trilha: dentro do portal, sistema sem trilha própria ganha a do portal com o próprio nome', async () => {
+    const portal = { abrir() {}, inicio() {}, sair() {}, entrar() {}, registrarBarra() {} };
+    const t = await abrir({ antesDeMontar: (w) => { w.SGE.barra._acharPortal = () => portal; } });
+    assert.deepEqual(t.$$('.trilha .pedaco').map((p) => p.textContent), ['Portal', 'Grupo GPS', 'Mecanizada', 'SST']);
+    t.fechar();
+});
+
 test('fora do portal: barra continua escura e o logo leva à página inicial', async () => {
     const t = await abrir();
     assert.ok(!t.$('.barra').classList.contains('clara'));

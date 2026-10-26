@@ -1,5 +1,8 @@
 # Mudanças do SGE Core
 
+## v1.8.0 · 2026-10-26
+- **Trilha na barra** (opção `trilha: [...]`): mostra onde a pessoa está como o caminho de uma pasta (ex.: Portal / Grupo GPS / Mecanizada / Gestão de Efetivo); "Portal" volta ao início e o último pedaço fica em destaque. Dentro do portal, sistemas sem trilha própria ganham a do portal com o próprio nome. Tela estreita: só os dois últimos pedaços. Testes: 2 novos.
+
 ## v1.7.0 · 2026-10-25
 - **Um tema só**: a chave `sge_tema` vale para o portal e todos os sistemas abertos nele; trocar o tema numa barra troca as outras páginas do mesmo endereço na hora (evento `storage`). **Sem escolha, sempre claro** (não segue mais o tema do aparelho).
 - Barra `clara` só no tema claro: no escuro volta a ser a barra escura (com o logo na caixa branca).

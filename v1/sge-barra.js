@@ -20,6 +20,8 @@
     const CACHE_MS = 5 * 60 * 1000;
     const CHAVE_TEMA = 'sge_tema';
     const OUTROS = 'Outros';
+    // Começo da trilha mostrada no portal (e nos sistemas abertos dentro dele).
+    const TRILHA_PORTAL = ['Portal', 'Grupo GPS', 'Mecanizada'];
     // Cor da barra dentro do Portal SGE (azul ardósia, a mesma das barras do portal).
     const COR_NO_PORTAL = { '--sge-barra-clara-fundo': '#dbe3ed', '--sge-barra-clara-linha': '#c2cedd' };
     const PROIBIDOS = /[\\\x00-\x1f\x7f]/;
@@ -205,6 +207,14 @@ p { margin: 0; }
 .nome strong { font-size: 15px; font-weight: 600; letter-spacing: -.01em; color: #fff; overflow: hidden; text-overflow: ellipsis; }
 .nome .sub, .nome .tela { font-size: 12px; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; }
 .nome .tela { display: none; }
+.trilha { display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; font-size: 14px; color: #94a3b8; }
+.trilha .pedaco { overflow: hidden; text-overflow: ellipsis; }
+.trilha a.pedaco:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.trilha .atual { color: #fff; font-weight: 600; }
+.trilha .sep { color: #64748b; opacity: .7; }
+.barra.clara .trilha { color: #64748b; }
+.barra.clara .trilha a.pedaco:hover, .barra.clara .trilha .atual { color: #0f172a; }
+.barra.clara .trilha .sep { color: #94a3b8; }
 .divisor { flex: none; width: 1px; height: 28px; background: rgba(255,255,255,.1); }
 .menu { display: flex; align-items: center; gap: 2px; min-width: 0; padding: 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,.06); background: rgba(255,255,255,.03); }
 .botao-menu { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: #cbd5e1; white-space: nowrap; transition: background .15s, color .15s; }
@@ -280,6 +290,8 @@ p { margin: 0; }
 .gaveta .acao { min-height: 48px; padding: 0 20px; border-top: 1px solid rgba(255,255,255,.1); border-radius: 0; }
 .gaveta .acao:hover { background: rgba(255,255,255,.07); }
 @media (max-width: 1180px) { .busca span, .busca kbd, .nome .sub { display: none; } }
+/* Tela estreita: só os dois últimos pedaços da trilha */
+@media (max-width: 900px) { .trilha .pedaco:not(:nth-last-child(-n+3)), .trilha .sep:not(:nth-last-child(-n+2)) { display: none; } }
 @media (max-width: 1100px) { .botao-menu .rotulo { display: none; } .botao-menu { padding: 0 10px; } }
 @media (max-width: 767px) {
   .barra { height: 56px; gap: 10px; padding: 0 12px; }
@@ -315,6 +327,7 @@ p { margin: 0; }
             op.aoEntrar = op.aoEntrar || (() => portal.entrar());
             try { portal.registrarBarra(window); } catch (_) { /* portal antigo: segue sem avisar */ } // o portal esconde a barra dele
             op.clara = true; // no portal, a barra do sistema fica igual à do portal
+            op.dentroDoPortal = true;
         }
         const host = document.createElement('sge-barra');
         if (portal) Object.entries(COR_NO_PORTAL).forEach(([k, v]) => host.style.setProperty(k, v));
@@ -430,6 +443,26 @@ p { margin: 0; }
             lista.replaceChildren(...filhos);
         }
 
+        // Trilha "Portal / Grupo GPS / Mecanizada / Sistema", como o caminho de uma pasta no computador: mostra onde a pessoa está.
+        // O primeiro pedaço ("Portal") volta ao início; o último fica em destaque. Dentro do portal, sistemas sem trilha própria
+        // ganham a do portal com o próprio nome no fim.
+        function trilhaEl() {
+            const pedacos = Array.isArray(op.trilha) ? op.trilha : (op.dentroDoPortal ? TRILHA_PORTAL.concat(op.nome ? [op.nome] : []) : null);
+            if (!pedacos || !pedacos.length) return null;
+            const filhos = [];
+            pedacos.forEach((texto, i) => {
+                if (i) filhos.push(el('span', { classe: 'sep', 'aria-hidden': 'true', texto: '/' }));
+                const ultimo = i === pedacos.length - 1;
+                if (i === 0 && !ultimo) {
+                    filhos.push(el('a', { classe: 'pedaco inicio', href: location.origin + '/', texto: String(texto),
+                        onclick: (ev) => { if (op.aoIrInicio && simples(ev)) { ev.preventDefault(); op.aoIrInicio(ev); } } }));
+                } else {
+                    filhos.push(el('span', { classe: 'pedaco' + (ultimo ? ' atual' : ''), 'aria-current': ultimo ? 'page' : null, texto: String(texto) }));
+                }
+            });
+            return el('nav', { classe: 'trilha', 'aria-label': 'Onde você está' }, filhos);
+        }
+
         function gradeEl() {
             const lista = el('div', { classe: 'lista-grade' });
             const painel = el('div', { classe: 'suspenso grade', role: 'dialog', 'aria-label': 'Seus sistemas' }, [
@@ -537,7 +570,7 @@ p { margin: 0; }
                     [el('img', { src: core.logo(clara ? 'recortado' : ''), alt: '' })]),
                     est.aberto === 'grade' ? (gradeAberta || gradeEl()) : null,
                 ]),
-                el('a', { classe: 'nome', href: op.inicio || location.pathname, onclick: (ev) => navegar(ev, op.inicio || location.pathname) }, [
+                trilhaEl() || el('a', { classe: 'nome', href: op.inicio || location.pathname, onclick: (ev) => navegar(ev, op.inicio || location.pathname) }, [
                     el('strong', { texto: op.nome || '' }),
                     op.area ? el('span', { classe: 'sub', texto: op.area }) : null,
                     rotuloAtual ? el('span', { classe: 'tela', texto: rotuloAtual }) : null,
