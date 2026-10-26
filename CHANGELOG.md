@@ -1,5 +1,8 @@
 # Mudanças do SGE Core
 
+## v1.9.0 · 2026-10-26
+- **Menu da barra só com ícones**: o nome de cada item (e a setinha do submenu) abre ao lado do ícone ao passar o mouse, focar ou abrir o submenu, como a barra lateral do portal. Pedido do Warlison.
+
 ## v1.8.0 · 2026-10-26
 - **Trilha na barra** (opção `trilha: [...]`): mostra onde a pessoa está como o caminho de uma pasta (ex.: Portal / Grupo GPS / Mecanizada / Gestão de Efetivo); "Portal" volta ao início e o último pedaço fica em destaque. Dentro do portal, sistemas sem trilha própria ganham a do portal com o próprio nome. Tela estreita: só os dois últimos pedaços. Testes: 2 novos.
 

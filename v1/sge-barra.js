@@ -217,7 +217,11 @@ p { margin: 0; }
 .barra.clara .trilha .sep { color: #94a3b8; }
 .divisor { flex: none; width: 1px; height: 28px; background: rgba(255,255,255,.1); }
 .menu { display: flex; align-items: center; gap: 2px; min-width: 0; padding: 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,.06); background: rgba(255,255,255,.03); }
-.botao-menu { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: #cbd5e1; white-space: nowrap; transition: background .15s, color .15s; }
+.botao-menu { display: flex; align-items: center; height: 36px; padding: 0 10px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: #cbd5e1; white-space: nowrap; transition: background .15s, color .15s; }
+/* Menu só com ícones: o nome (e a setinha) abre ao lado ao passar o mouse, focar ou abrir o submenu, como a barra lateral do portal */
+.botao-menu .rotulo, .botao-menu svg[data-icone="seta-baixo"] { display: inline-block; max-width: 0; opacity: 0; margin-left: 0; overflow: hidden; transition: max-width .25s ease, opacity .2s ease, margin-left .25s ease; }
+.botao-menu:is(:hover, :focus-visible, [aria-expanded="true"]) .rotulo { max-width: 180px; opacity: 1; margin-left: 8px; }
+.botao-menu:is(:hover, :focus-visible, [aria-expanded="true"]) svg[data-icone="seta-baixo"] { max-width: 14px; opacity: 1; margin-left: 4px; }
 .botao-menu:hover { background: rgba(255,255,255,.07); color: #fff; }
 .botao-menu.ativo, .botao-menu[aria-expanded="true"] { background: rgba(255,255,255,.12); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.08); }
 .espaco { flex: 1; }
@@ -292,7 +296,7 @@ p { margin: 0; }
 @media (max-width: 1180px) { .busca span, .busca kbd, .nome .sub { display: none; } }
 /* Tela estreita: só os dois últimos pedaços da trilha */
 @media (max-width: 900px) { .trilha .pedaco:not(:nth-last-child(-n+3)), .trilha .sep:not(:nth-last-child(-n+2)) { display: none; } }
-@media (max-width: 1100px) { .botao-menu .rotulo { display: none; } .botao-menu { padding: 0 10px; } }
+@media (prefers-reduced-motion: reduce) { .botao-menu .rotulo, .botao-menu svg[data-icone="seta-baixo"] { transition: none; } }
 @media (max-width: 767px) {
   .barra { height: 56px; gap: 10px; padding: 0 12px; }
   .menu, .divisor, .caixa-usuario, .tema { display: none; }
