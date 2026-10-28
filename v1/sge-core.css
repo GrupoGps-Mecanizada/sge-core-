@@ -29,11 +29,11 @@
     --sge-fonte: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --sge-fonte-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
 
-    --sge-raio: 10px;
-    --sge-raio-pequeno: 6px;
-    --sge-sombra: 0 1px 3px rgba(15, 23, 42, .08), 0 4px 12px rgba(15, 23, 42, .06);
-    --sge-sombra-forte: 0 12px 40px rgba(15, 23, 42, .25);
-    --sge-toque: 44px;             /* altura mínima de botão (dedo no tablet) */
+    --sge-raio: 0.625rem;
+    --sge-raio-pequeno: 0.375rem;
+    --sge-sombra: 0 1px 0.1875rem rgba(15, 23, 42, .08), 0 0.25rem 0.75rem rgba(15, 23, 42, .06);
+    --sge-sombra-forte: 0 0.75rem 2.5rem rgba(15, 23, 42, .25);
+    --sge-toque: 2.75rem;             /* altura mínima de botão (dedo no tablet) */
 }
 
 /* ── Tema escuro (automático ou forçado com data-tema="escuro") ── */
@@ -81,13 +81,13 @@
     -webkit-font-smoothing: antialiased;
 }
 .sge *, .sge *::before, .sge *::after { box-sizing: border-box; }
-.sge :focus-visible { outline: 3px solid var(--sge-destaque); outline-offset: 2px; }
+.sge :focus-visible { outline: 0.1875rem solid var(--sge-destaque); outline-offset: 2px; }
 
 /* ── Botões ───────────────────────────────────────────── */
 .sge-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    min-height: var(--sge-toque); padding: 0 18px;
-    font: 600 15px/1 var(--sge-fonte);
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    min-height: var(--sge-toque); padding: 0 1.125rem;
+    font: 600 0.9375rem/1 var(--sge-fonte);
     color: #fff; background: var(--sge-destaque);
     border: 1px solid transparent; border-radius: var(--sge-raio-pequeno);
     cursor: pointer; transition: background .15s, opacity .15s;
@@ -106,57 +106,57 @@
     border: 1px solid var(--sge-borda);
     border-radius: var(--sge-raio);
     box-shadow: var(--sge-sombra);
-    padding: 16px;
+    padding: 1rem;
 }
-@media (min-width: 768px) { .sge-cartao { padding: 24px; } }
+@media (min-width: 768px) { .sge-cartao { padding: 1.5rem; } }
 
 /* ── Campos de formulário ─────────────────────────────── */
-.sge-campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-.sge-campo label { font-size: 14px; font-weight: 600; color: var(--sge-texto-2); }
+.sge-campo { display: flex; flex-direction: column; gap: 0.375rem; margin-bottom: 0.875rem; }
+.sge-campo label { font-size: 0.875rem; font-weight: 600; color: var(--sge-texto-2); }
 .sge-input, .sge-select, .sge-textarea {
-    min-height: var(--sge-toque); width: 100%; padding: 10px 12px;
-    font: 16px var(--sge-fonte);  /* 16px evita zoom automático no celular */
+    min-height: var(--sge-toque); width: 100%; padding: 0.625rem 0.75rem;
+    font: 1rem var(--sge-fonte);  /* 1rem evita zoom automático no celular */
     color: var(--sge-texto); background: var(--sge-superficie);
     border: 1px solid var(--sge-borda); border-radius: var(--sge-raio-pequeno);
 }
 .sge-input:focus, .sge-select:focus, .sge-textarea:focus {
-    outline: none; border-color: var(--sge-destaque); box-shadow: 0 0 0 3px var(--sge-destaque-suave);
+    outline: none; border-color: var(--sge-destaque); box-shadow: 0 0 0 0.1875rem var(--sge-destaque-suave);
 }
 
 /* ── Tabela (rola de lado no celular) ─────────────────── */
 .sge-tabela-caixa { overflow-x: auto; border: 1px solid var(--sge-borda); border-radius: var(--sge-raio); }
-.sge-tabela { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--sge-superficie); }
+.sge-tabela { width: 100%; border-collapse: collapse; font-size: 0.875rem; background: var(--sge-superficie); }
 .sge-tabela th { text-align: left; font-weight: 600; color: var(--sge-texto-2); background: var(--sge-superficie-2); }
-.sge-tabela th, .sge-tabela td { padding: 10px 12px; border-bottom: 1px solid var(--sge-borda); white-space: nowrap; }
+.sge-tabela th, .sge-tabela td { padding: 0.625rem 0.75rem; border-bottom: 1px solid var(--sge-borda); white-space: nowrap; }
 .sge-tabela tbody tr:hover { background: var(--sge-destaque-suave); }
 
 /* ── Avisos (toast) ───────────────────────────────────── */
 .sge-avisos {
-    position: fixed; z-index: 2147483000; left: 50%; bottom: 16px; transform: translateX(-50%);
-    display: flex; flex-direction: column; gap: 8px; width: min(92vw, 420px); pointer-events: none;
+    position: fixed; z-index: 2147483000; left: 50%; bottom: 1rem; transform: translateX(-50%);
+    display: flex; flex-direction: column; gap: 0.5rem; width: min(92vw, 26.25rem); pointer-events: none;
 }
 .sge-aviso {
-    pointer-events: auto; display: flex; gap: 10px; align-items: flex-start;
-    padding: 12px 14px; border-radius: var(--sge-raio-pequeno);
-    font: 500 14px/1.45 var(--sge-fonte); color: #fff; background: #1f2937;
-    box-shadow: var(--sge-sombra-forte); border-left: 4px solid var(--sge-info);
+    pointer-events: auto; display: flex; gap: 0.625rem; align-items: flex-start;
+    padding: 0.75rem 0.875rem; border-radius: var(--sge-raio-pequeno);
+    font: 500 0.875rem/1.45 var(--sge-fonte); color: #fff; background: #1f2937;
+    box-shadow: var(--sge-sombra-forte); border-left: 0.25rem solid var(--sge-info);
     animation: sge-entrar .2s ease-out;
 }
 .sge-aviso--sucesso { border-left-color: #22c55e; }
 .sge-aviso--alerta  { border-left-color: #f59e0b; }
 .sge-aviso--erro    { border-left-color: #ef4444; }
-.sge-aviso button { margin-left: auto; background: none; border: 0; color: #cbd5e1; font-size: 18px; line-height: 1; cursor: pointer; }
-@keyframes sge-entrar { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.sge-aviso button { margin-left: auto; background: none; border: 0; color: #cbd5e1; font-size: 1.125rem; line-height: 1; cursor: pointer; }
+@keyframes sge-entrar { from { opacity: 0; transform: translateY(0.5rem); } to { opacity: 1; transform: none; } }
 
 /* ── Carregando ───────────────────────────────────────── */
 .sge-carregando {
     position: fixed; inset: 0; z-index: 2147482000;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
-    background: rgba(15, 23, 42, .45); color: #fff; font: 500 15px var(--sge-fonte);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.875rem;
+    background: rgba(15, 23, 42, .45); color: #fff; font: 500 0.9375rem var(--sge-fonte);
 }
 .sge-roda {
-    width: 40px; height: 40px; border-radius: 50%;
-    border: 4px solid rgba(255, 255, 255, .3); border-top-color: #fff;
+    width: 2.5rem; height: 2.5rem; border-radius: 50%;
+    border: 0.25rem solid rgba(255, 255, 255, .3); border-top-color: #fff;
     animation: sge-girar .8s linear infinite;
 }
 @keyframes sge-girar { to { transform: rotate(360deg); } }
@@ -167,10 +167,17 @@ html.sge-acesso-pendente body > *:not(.sge-carregando):not(.sge-avisos):not(.sge
 /* ── Faixa "sem internet" ─────────────────────────────── */
 .sge-offline {
     position: fixed; z-index: 2147483001; top: 0; left: 0; right: 0;
-    padding: 8px 12px; text-align: center;
-    font: 600 14px var(--sge-fonte); color: #fff; background: var(--sge-alerta);
+    padding: 0.5rem 0.75rem; text-align: center;
+    font: 600 0.875rem var(--sge-fonte); color: #fff; background: var(--sge-alerta);
 }
 
 @media (prefers-reduced-motion: reduce) {
     .sge-aviso, .sge-roda { animation: none; }
+}
+
+/* Densidade compacta (sge-core 1.10.0, pesquisa de 28/10/2026): no computador a letra base cai para 80% (12,8 px) e,
+   como as medidas do SGE são em rem, a tela inteira fica menor de verdade. Celular continua em 100% (toque).
+   O sistema liga pondo a classe sge-compacto no <html>. Ctrl + rodinha continua funcionando. */
+@media (min-width: 1024px) and (pointer: fine) {
+    html.sge-compacto { font-size: 80%; }
 }

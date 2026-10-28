@@ -1,5 +1,8 @@
 # Mudanças do SGE Core
 
+## v1.10.0 · 2026-10-28
+- **Densidade compacta** (pesquisa no cofre: "2026-10-28 Sistema menor por padrão"): todas as medidas de `sge-core.css` e da barra (`sge-barra.js`) passaram de px para rem (menos linhas de 1 e 2 px e as larguras das telas nos @media). Com a letra base de 16 px nada muda. Novo: classe `sge-compacto` no `<html>` baixa a letra base para 80% no computador (1024 px ou mais, com mouse) e a tela inteira fica menor de verdade; celular continua 100%. Pedido do Warlison (P-211).
+
 ## v1.9.2 · 2026-10-28
 - **Barra mais fina**: 62 → 48 px no computador e 56 → 50 no celular (botões continuam com 44 px de toque). Logo 32, botões 32, avatar 30, divisor 22. Quem reservava 62 px embaixo da barra precisa usar 48. Pedido do Warlison.
 
