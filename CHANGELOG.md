@@ -1,5 +1,8 @@
 # Mudanças do SGE Core
 
+## v1.9.2 · 2026-10-28
+- **Barra mais fina**: 62 → 48 px no computador e 56 → 50 no celular (botões continuam com 44 px de toque). Logo 32, botões 32, avatar 30, divisor 22. Quem reservava 62 px embaixo da barra precisa usar 48. Pedido do Warlison.
+
 ## v1.9.1 · 2026-10-26
 - A trilha "Portal / Grupo GPS / Mecanizada" saiu dos sistemas abertos no portal (o dono não gostou): a barra volta a mostrar só o logo e o nome do sistema. A opção `trilha` continua existindo, mas só aparece se o sistema pedir.
 
