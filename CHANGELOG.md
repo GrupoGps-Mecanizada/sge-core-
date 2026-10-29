@@ -1,5 +1,8 @@
 # Mudanças do SGE Core
 
+## v1.11.1 · 2026-10-29
+- Logo do carregando mais transparente e enchendo da esquerda (perna do S) para a direita (fim do E); segura cheia e some devagar. Mesmo desenho do SST v1.19.0. Pedido do Warlison (P-260).
+
 ## v1.11.0 · 2026-10-28
 - **Carregando com a logo enchendo** (pedido do Warlison, P-233; mesma animação aprovada no SST v1.17.0): `SGE.carregando()` mostra a logo oficial só no contorno, enchendo e esvaziando de azul, sobre um fundo claro desfocado (antes: rodinha branca em fundo escuro). Surge depois de 0,2 s, para esperas curtas não piscarem. Roda mesmo com as animações do Windows desligadas.
 - Novo `SGE.logoCarregando()`: devolve só a logo enchendo, para pôr em qualquer lugar. Atalho sem código: qualquer elemento com `data-sge-carregando="texto"` ganha a logo pequena sozinho, mesmo se for criado depois.
