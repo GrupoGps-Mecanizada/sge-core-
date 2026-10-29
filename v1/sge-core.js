@@ -8,7 +8,8 @@
  *   SGE.cliente(url?, chave?)  → UMA conexão Supabase por projeto (sem repetir createClient)
  *   SGE.aviso(texto, tipo)     → mensagem rápida na tela (sucesso | erro | alerta | info)
  *   SGE.erro(e, contexto)      → traduz o erro técnico em mensagem simples e mostra
- *   SGE.carregando(sim, texto) → tela de "carregando"
+ *   SGE.carregando(sim, texto) → tela de "carregando" (logo enchendo)
+ *   SGE.logoCarregando()       → só a logo enchendo, para pôr em qualquer lugar
  *   SGE.seguro(fn, opcoes)     → roda uma ação com "carregando" + tratamento de erro
  *   SGE.rascunho               → guarda o que foi digitado (não perde com internet ruim)
  *   SGE.formatar               → data, data e hora, número e moeda no padrão brasileiro
@@ -135,6 +136,103 @@
         return texto;
     }
 
+    // ── Logo enchendo (carregando) ──────────────────────────
+    // Contorno da logo oficial (favicon) em curvas lisas, redesenhado do logo-sge-azul.png de 2400 px.
+    const _LOGO_D = 'M264.0 383.8C267.6 382.9 274.3 381.6 278.9 381.0C291.8 379.2 308.2 374.8 323.1 369.0C351.4 357.9 362.2 350.8 385.3 328.0C416.6 297.4 441.9 259.5 449.5 232.0C451.0 226.8 454.6 215.1 457.5 206.0C460.4 196.9 465.1 181.2 468.0 171.0C476.8 139.2 480.4 130.7 492.1 112.9C500.2 100.7 519.2 81.6 531.4 73.6C548.3 62.5 560.7 57.3 584.5 51.3C594.8 48.7 596.8 48.5 617.5 48.5C635.0 48.5 641.2 48.9 647.9 50.3C673.2 55.8 694.2 66.3 718.5 85.6C737.4 100.7 751.0 100.8 758.5 86.1C761.0 81.2 760.1 72.5 756.4 66.2C752.9 60.2 735.1 42.5 727.1 37.1C719.9 32.1 696.1 20.1 686.7 16.5C676.1 12.5 657.4 8.0 646.5 6.9C640.4 6.2 625.8 6.0 609.0 6.3C577.1 6.9 577.7 6.8 541.5 18.6C516.2 26.9 515.4 27.3 502.6 36.8C486.3 49.1 453.4 90.2 442.5 111.9C438.1 120.6 430.4 143.4 423.5 167.5C410.0 215.3 397.8 243.4 381.2 265.5C371.9 277.9 337.5 312.1 328.1 318.2C318.7 324.3 304.7 331.1 292.6 335.3L283.5 338.5 L154.5 339.0C59.8 339.4 24.6 339.9 22.2 340.7C12.1 344.3 5.8 350.9 4.5 359.5C2.4 372.6 12.8 382.6 31.0 385.0C34.0 385.4 86.2 385.7 147.0 385.6C244.5 385.4 258.3 385.2 264.0 383.8ZM644.0 381.9C668.2 377.9 684.6 372.6 708.0 360.9C722.7 353.5 727.3 350.6 737.0 342.7C760.2 323.7 779.2 300.0 791.6 274.5C796.5 264.3 799.4 256.5 805.1 237.1C807.7 228.5 810.3 224.4 814.9 221.3C819.9 217.9 823.9 217.6 842.0 218.8C854.5 219.7 860.6 219.7 867.0 218.9C872.7 218.1 912.5 217.5 989.0 217.1L1102.5 216.4 L1114.5 213.3C1132.0 208.7 1142.6 204.6 1150.2 199.4C1160.0 192.7 1179.5 172.1 1184.8 162.8C1190.4 152.9 1195.6 138.3 1196.9 128.6C1198.3 118.8 1198.3 98.5 1197.0 90.0C1194.0 71.2 1184.0 52.3 1168.1 35.7C1156.0 23.0 1144.7 15.9 1128.5 10.7C1116.7 7.0 1117.0 7.0 1096.5 6.0C1086.0 5.5 1073.7 4.4 1069.0 3.6C1057.6 1.5 1043.2 1.6 1029.1 3.9C1022.7 5.0 1011.2 6.1 1003.5 6.4C991.9 6.8 986.9 7.6 975.0 10.6C967.0 12.6 957.2 15.5 953.0 17.2C934.2 24.6 909.0 40.0 891.3 54.9C876.9 66.9 850.3 105.8 841.5 127.6C834.1 145.8 840.8 158.0 858.1 158.0C866.2 158.0 873.5 154.6 878.4 148.7C880.3 146.4 884.6 138.9 888.0 132.0C896.8 114.4 900.4 109.4 916.4 93.2C936.8 72.4 950.0 64.3 979.2 54.6C999.4 47.9 1001.1 47.8 1056.0 48.2C1097.4 48.6 1105.3 48.9 1110.3 50.3C1122.8 53.9 1133.5 61.0 1140.7 70.5C1146.2 77.7 1152.3 90.4 1154.0 98.1C1155.8 106.2 1154.9 122.0 1152.2 129.4C1145.9 146.8 1130.2 163.2 1115.2 168.2L1108.5 170.4 L1010.0 170.8C936.3 171.1 906.2 170.8 890.5 169.8C864.2 168.2 848.5 168.2 825.0 169.8C812.4 170.6 777.4 171.0 716.0 171.0C620.0 171.0 620.8 171.0 611.5 175.8C604.2 179.5 600.0 186.2 600.0 194.0C600.0 203.7 606.3 211.4 617.4 215.3C619.4 216.0 642.9 216.6 683.5 216.9C745.4 217.5 746.6 217.5 751.2 219.7C756.7 222.2 759.0 225.9 759.0 232.3C759.0 240.5 750.6 260.7 741.3 275.0C735.5 283.8 712.5 307.2 704.2 312.8C690.0 322.4 667.1 333.0 653.0 336.7C643.8 339.0 642.5 339.1 616.5 338.7C590.1 338.3 589.2 338.3 577.5 335.2C563.1 331.4 542.2 321.5 528.5 311.8C510.6 299.3 491.8 277.4 481.8 257.7C477.2 248.5 474.0 244.0 470.8 242.4C464.2 239.0 457.5 244.1 450.7 257.9C447.0 265.4 446.5 267.1 446.5 273.4C446.5 279.9 446.9 281.2 450.8 288.4C458.1 301.8 465.8 311.9 480.0 326.4C504.5 351.4 520.8 361.5 556.2 373.4C568.1 377.4 598.6 384.2 609.5 385.3C615.8 386.0 624.0 385.1 644.0 381.9ZM1181.4 383.1C1191.4 379.1 1197.0 371.4 1197.0 361.9C1197.0 356.4 1192.7 348.5 1188.2 345.5C1178.9 339.4 1182.9 339.6 1084.0 339.0C1002.4 338.5 992.9 338.2 987.5 336.7C978.2 334.0 971.8 331.3 955.0 322.9C938.1 314.5 924.7 306.0 915.8 298.1C905.4 288.7 893.9 271.5 885.6 252.9C877.8 235.5 871.6 230.0 858.6 229.3C852.6 228.9 850.8 229.2 847.0 231.2C834.6 237.6 835.1 248.8 849.1 278.0C858.3 297.1 868.3 311.4 882.5 325.6C897.6 340.8 914.6 352.8 936.7 363.8C952.4 371.7 988.2 381.3 1015.3 385.0C1018.7 385.4 1056.2 385.7 1098.5 385.6L1175.5 385.5 L1181.4 383.1ZM345.2 290.0C350.3 288.5 356.8 281.0 362.1 270.3C366.5 261.6 366.5 261.4 366.5 251.0C366.4 239.4 364.7 233.8 357.9 222.4C353.3 214.7 338.5 199.3 328.8 192.0C314.8 181.5 306.2 178.0 282.0 173.4L268.5 170.9 L183.0 171.1C117.1 171.2 96.4 171.0 92.5 170.0C73.3 165.2 56.8 149.8 48.7 129.1C41.4 110.5 45.4 88.6 59.5 70.4C65.2 63.1 70.5 58.8 79.4 54.3C92.5 47.7 81.4 48.0 278.5 48.0C430.6 48.0 458.5 47.7 464.3 46.5C473.2 44.6 483.4 39.7 494.3 31.9C508.9 21.5 512.7 15.7 508.1 11.1C503.4 6.4 510.1 6.5 291.0 6.5L84.5 6.5 L75.6 9.3C56.6 15.2 45.0 22.1 32.9 34.6C24.5 43.3 20.4 49.2 14.1 61.8C0.1 89.8 -1.5 118.4 9.2 149.0C14.5 164.1 20.4 172.5 36.8 188.0C42.8 193.8 50.2 200.0 53.3 201.9C60.1 205.9 72.1 210.1 86.8 213.7L97.5 216.4 L188.5 217.0C268.7 217.6 280.1 217.8 285.0 219.3C298.3 223.3 311.4 232.2 318.1 242.0C323.0 249.0 327.6 261.6 329.6 273.4C331.3 283.4 333.3 287.8 337.1 289.7C340.0 291.2 340.5 291.3 345.2 290.0Z';
+    const _LOGO_L = 1200, _LOGO_A = 388, _ONDA = 300, _CICLO = 4.2;
+    const _VAZIO = _LOGO_A + 30, _CHEIO = -20;
+    const _NS = 'http://www.w3.org/2000/svg';
+    const _ondas = (() => {
+        let d = 'M' + (-2 * _ONDA) + ' 0';
+        for (let x = -2 * _ONDA; x < _LOGO_L + 2 * _ONDA; x += _ONDA) d += ' Q' + (x + _ONDA / 4) + ' -14 ' + (x + _ONDA / 2) + ' 0 T' + (x + _ONDA) + ' 0';
+        return d + ' V' + (_LOGO_A + 80) + ' H' + (-2 * _ONDA) + ' Z';
+    })();
+    const _vivas = new Set();
+    let _quadro = 0, _ultimo = 0, _seq = 0;
+
+    function _el(nome, attrs) {
+        const e = document.createElementNS(_NS, nome);
+        Object.keys(attrs || {}).forEach((k) => e.setAttribute(k, attrs[k]));
+        return e;
+    }
+
+    // Um só relógio para todas as logos da página (~30 quadros por segundo).
+    // Roda mesmo com as animações do Windows desligadas: é o aviso de "carregando", lento e suave.
+    function _animar(ms) {
+        _quadro = 0;
+        _vivas.forEach((v) => { if (!v.svg.isConnected) _vivas.delete(v); });
+        if (!_vivas.size) return;
+        _quadro = requestAnimationFrame(_animar);
+        if (ms - _ultimo < 33) return;
+        _ultimo = ms;
+        const s = ms / 1000, f = (s % _CICLO) / _CICLO;
+        const x = f < 0.5 ? f * 2 : 2 - f * 2;
+        const y = _VAZIO - (0.5 - 0.5 * Math.cos(Math.PI * x)) * (_VAZIO - _CHEIO);
+        _vivas.forEach((v) => {
+            v.nivel.setAttribute('transform', 'translate(0 ' + y.toFixed(1) + ')');
+            v.o1.setAttribute('transform', 'translate(' + ((s * 200) % _ONDA).toFixed(1) + ' 0)');
+            v.o2.setAttribute('transform', 'translate(' + (-(s * 130) % _ONDA).toFixed(1) + ' 0)');
+        });
+    }
+
+    // Logo oficial só no contorno, enchendo e esvaziando de azul (aprovada pelo dono em 28/10/2026).
+    // Devolve o <svg>; o tamanho vem do CSS (classe sge-logo-enchendo).
+    function logoCarregando() {
+        const id = 'sgelc' + (++_seq);
+        const svg = _el('svg', { viewBox: '-10 -10 ' + (_LOGO_L + 20) + ' ' + (_LOGO_A + 20), class: 'sge-logo-enchendo', 'aria-hidden': 'true' });
+        const defs = _el('defs');
+        const clip = _el('clipPath', { id: id + 'c' });
+        clip.appendChild(_el('path', { d: _LOGO_D, 'clip-rule': 'evenodd' }));
+        const liq = _el('linearGradient', { id: id + 'l', x1: 0, y1: 0, x2: 0, y2: 1 });
+        liq.append(_el('stop', { offset: 0, style: 'stop-color:var(--sge-logo-claro)' }), _el('stop', { offset: 1, style: 'stop-color:var(--sge-logo-escuro)' }));
+        // contorno que esmaece nas pontas (logo "ofuscada", elegante)
+        const borda = _el('linearGradient', { id: id + 'b', x1: 0, y1: 0, x2: 1, y2: 0 });
+        borda.append(
+            _el('stop', { offset: 0, style: 'stop-color:var(--sge-logo-escuro);stop-opacity:.25' }),
+            _el('stop', { offset: 0.5, style: 'stop-color:var(--sge-logo-escuro);stop-opacity:.75' }),
+            _el('stop', { offset: 1, style: 'stop-color:var(--sge-logo-escuro);stop-opacity:.25' }),
+        );
+        defs.append(clip, liq, borda);
+        const g = _el('g', { 'clip-path': 'url(#' + id + 'c)' });
+        const nivel = _el('g', { transform: 'translate(0 ' + _VAZIO + ')' });
+        const o2 = _el('path', { d: _ondas, opacity: 0.35, style: 'fill:var(--sge-logo-claro)' });
+        const o1 = _el('path', { d: _ondas, opacity: 0.85, fill: 'url(#' + id + 'l)' });
+        nivel.append(o2, o1);
+        g.appendChild(nivel);
+        const contorno = _el('path', { d: _LOGO_D, fill: 'none', 'fill-rule': 'evenodd', stroke: 'url(#' + id + 'b)', 'stroke-width': 2, 'vector-effect': 'non-scaling-stroke' });
+        svg.append(defs, g, contorno);
+        _vivas.add({ svg, nivel, o1, o2 });
+        if (!_quadro && typeof requestAnimationFrame === 'function') _quadro = requestAnimationFrame(_animar);
+        return svg;
+    }
+
+    // Qualquer elemento com data-sge-carregando ganha a logo enchendo sozinho
+    // (ex.: <div data-sge-carregando="Carregando pendências…"></div>).
+    function _preencherMarcados(raiz) {
+        if (!raiz.querySelectorAll) return;
+        const lista = raiz.matches && raiz.matches('[data-sge-carregando]') ? [raiz] : [];
+        raiz.querySelectorAll('[data-sge-carregando]').forEach((e) => lista.push(e));
+        lista.forEach((e) => {
+            if (e.querySelector(':scope > .sge-logo-enchendo')) return;
+            e.classList.add('sge-carregando-local');
+            e.appendChild(logoCarregando());
+            const texto = e.getAttribute('data-sge-carregando');
+            if (texto) {
+                const span = document.createElement('span');
+                span.textContent = texto;
+                e.appendChild(span);
+            }
+        });
+    }
+    function _vigiarMarcados() {
+        if (typeof MutationObserver === 'undefined' || !document.body) return;
+        _preencherMarcados(document.body);
+        new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach((n) => n.nodeType === 1 && _preencherMarcados(n))))
+            .observe(document.body, { childList: true, subtree: true });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _vigiarMarcados);
+    else _vigiarMarcados();
+
     // ── Carregando ──────────────────────────────────────────
     let _telaCarregando = null;
     let _contaCarregando = 0;
@@ -147,10 +245,8 @@
                 _telaCarregando.className = 'sge-carregando';
                 _telaCarregando.setAttribute('role', 'alert');
                 _telaCarregando.setAttribute('aria-busy', 'true');
-                const roda = document.createElement('div');
-                roda.className = 'sge-roda';
                 const legenda = document.createElement('span');
-                _telaCarregando.append(roda, legenda);
+                _telaCarregando.append(logoCarregando(), legenda);
                 document.body.appendChild(_telaCarregando);
             }
             _telaCarregando.lastChild.textContent = texto || 'Carregando...';
@@ -707,6 +803,7 @@
         aviso,
         erro,
         carregando,
+        logoCarregando,
         seguro,
         rascunho,
         formatar,

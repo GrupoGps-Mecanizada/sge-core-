@@ -92,3 +92,25 @@ test('SGE.rascunho guarda o formulário mas nunca a senha', () => {
     assert.deepEqual(JSON.parse(JSON.stringify(w.SGE.rascunho.ler('f'))), { nome: 'João' });
     fechar();
 });
+
+test('carregando mostra a logo enchendo; data-sge-carregando ganha a logo sozinho', async () => {
+    const { w, fechar } = montar({ html: '<div id="parte" data-sge-carregando="Carregando pendências…"></div>' });
+    w.SGE.carregando(true, 'Salvando...');
+    const tela = w.document.querySelector('.sge-carregando');
+    assert.ok(tela.querySelector('svg.sge-logo-enchendo'));
+    assert.equal(tela.lastChild.textContent, 'Salvando...');
+    w.SGE.carregando(false);
+    assert.equal(w.document.querySelector('.sge-carregando'), null);
+    await new Promise((r) => setTimeout(r, 0)); // espera a página terminar de abrir
+    const parte = w.document.getElementById('parte');
+    assert.ok(parte.querySelector('svg.sge-logo-enchendo'));
+    assert.ok(parte.classList.contains('sge-carregando-local'));
+    // marcado depois que a página abriu também ganha
+    const novo = w.document.createElement('div');
+    novo.setAttribute('data-sge-carregando', '');
+    w.document.body.appendChild(novo);
+    await new Promise((r) => setTimeout(r, 0));
+    assert.ok(novo.querySelector('svg.sge-logo-enchendo'));
+    assert.equal(typeof w.SGE.logoCarregando, 'function');
+    fechar();
+});

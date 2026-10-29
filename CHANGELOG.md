@@ -1,5 +1,11 @@
 # Mudanças do SGE Core
 
+## v1.11.0 · 2026-10-28
+- **Carregando com a logo enchendo** (pedido do Warlison, P-233; mesma animação aprovada no SST v1.17.0): `SGE.carregando()` mostra a logo oficial só no contorno, enchendo e esvaziando de azul, sobre um fundo claro desfocado (antes: rodinha branca em fundo escuro). Surge depois de 0,2 s, para esperas curtas não piscarem. Roda mesmo com as animações do Windows desligadas.
+- Novo `SGE.logoCarregando()`: devolve só a logo enchendo, para pôr em qualquer lugar. Atalho sem código: qualquer elemento com `data-sge-carregando="texto"` ganha a logo pequena sozinho, mesmo se for criado depois.
+- Cores `--sge-logo-claro` e `--sge-logo-escuro` (tema claro e escuro). A classe antiga `.sge-roda` continua existindo.
+- Testes: 1 novo; nos testes a animação fica desligada (`requestAnimationFrame` vazio no ajudante).
+
 ## v1.10.0 · 2026-10-28
 - **Densidade compacta** (pesquisa no cofre: "2026-10-28 Sistema menor por padrão"): todas as medidas de `sge-core.css` e da barra (`sge-barra.js`) passaram de px para rem (menos linhas de 1 e 2 px e as larguras das telas nos @media). Com a letra base de 16 px nada muda. Novo: classe `sge-compacto` no `<html>` baixa a letra base para 80% no computador (1024 px ou mais, com mouse) e a tela inteira fica menor de verdade; celular continua 100%. Pedido do Warlison (P-211).
 

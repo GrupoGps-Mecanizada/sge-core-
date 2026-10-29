@@ -6,6 +6,8 @@
 
 /* ── Cores e medidas (tema claro) ─────────────────────── */
 :root {
+    --sge-logo-claro: #4f7fc4;        /* líquido da logo enchendo (carregando) */
+    --sge-logo-escuro: #1b3a6b;
     --sge-marca: #1B3A6B;          /* azul-marinho do logo */
     --sge-marca-escura: #0d1b2e;   /* menu lateral */
     --sge-destaque: #1d4ed8;       /* botões e links */
@@ -39,6 +41,8 @@
 /* ── Tema escuro (automático ou forçado com data-tema="escuro") ── */
 @media (prefers-color-scheme: dark) {
     :root:not([data-tema="claro"]) {
+        --sge-logo-claro: #9ec1ff;
+        --sge-logo-escuro: #4f86d9;
         --sge-destaque: #3b82f6;
         --sge-destaque-hover: #60a5fa;
         --sge-destaque-suave: #3b82f61f;
@@ -56,6 +60,8 @@
     }
 }
 :root[data-tema="escuro"] {
+    --sge-logo-claro: #9ec1ff;
+    --sge-logo-escuro: #4f86d9;
     --sge-destaque: #3b82f6;
     --sge-destaque-hover: #60a5fa;
     --sge-destaque-suave: #3b82f61f;
@@ -152,8 +158,22 @@
 .sge-carregando {
     position: fixed; inset: 0; z-index: 2147482000;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.875rem;
-    background: rgba(15, 23, 42, .45); color: #fff; font: 500 0.9375rem var(--sge-fonte);
+    background: color-mix(in srgb, var(--sge-fundo, #f1f5f9) 82%, transparent);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    color: var(--sge-texto-3, #64748b); font: 500 0.8125rem var(--sge-fonte); letter-spacing: .02em;
+    animation: sge-surgir .3s ease-out .2s both; /* esperas curtas não piscam */
 }
+.sge-carregando .sge-logo-enchendo { width: 15rem; max-width: 70vw; }
+/* logo enchendo dentro de um pedaço da tela: <div data-sge-carregando="texto"> */
+.sge-carregando-local {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.625rem;
+    min-height: 6rem; padding: 1rem; color: var(--sge-texto-3, #64748b); font-size: 0.8125rem;
+    animation: sge-surgir .3s ease-out .2s both;
+}
+.sge-carregando-local .sge-logo-enchendo { width: 7rem; }
+.sge-logo-enchendo { height: auto; opacity: .9; }
+@keyframes sge-surgir { from { opacity: 0; } to { opacity: 1; } }
+/* antigo, para quem ainda desenha a rodinha à mão */
 .sge-roda {
     width: 2.5rem; height: 2.5rem; border-radius: 50%;
     border: 0.25rem solid rgba(255, 255, 255, .3); border-top-color: #fff;

@@ -65,6 +65,8 @@ function montar({ url = 'https://grupogps-mecanizada.github.io/gestao/', html = 
         url, runScripts: 'outside-only', pretendToBeVisual: true,
     });
     const w = dom.window;
+    // a logo enchendo do carregando anima sem parar: nos testes não precisa (e prenderia o processo)
+    w.requestAnimationFrame = () => 0;
     if (supa) w.supabase = { createClient: supa.createClient };
     if (antes) antes(w);
     w.eval(CODIGO);
