@@ -1,5 +1,8 @@
 # Mudanças do SGE Core
 
+## v1.12.0 · 2026-11-11
+- Ícones novos da barra: Sair vira uma porta e Tema vira sol com lua (portfólio aprovado pelo dono). Valem para todos os sistemas que usam o sge-core.
+
 ## v1.11.1 · 2026-10-29
 - Logo do carregando mais transparente e enchendo da esquerda (perna do S) para a direita (fim do E); segura cheia e some devagar. Mesmo desenho do SST v1.19.0. Pedido do Warlison (P-260).
 
