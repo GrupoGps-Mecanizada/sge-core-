@@ -95,6 +95,19 @@
         }).filter(Boolean);
     }
 
+    // Um visual só (dono, 17/11/2026): sistema aberto por fora, no endereço do portal, vai para dentro do portal na
+    // mesma página (#/u/<caminho>). Devolve o endereço para onde ir, ou null para ficar. Fica quando: está dentro de
+    // uma moldura, não é o endereço do portal, ou o portal abriu o sistema numa aba própria (marca sge_fora=1).
+    const ENDERECO_PORTAL = 'sge-portal.pages.dev';
+    function destinoForaDoPortal(href, emQuadro, marcadoFora) {
+        if (emQuadro || marcadoFora) return null;
+        let u;
+        try { u = new URL(href); } catch (_) { return null; }
+        if (u.protocol !== 'https:' || u.hostname !== ENDERECO_PORTAL || u.searchParams.has('sge_fora')) return null;
+        if (u.pathname === '/' || u.pathname === '/index.html') return null; // é o próprio portal
+        return u.origin + '/#/u/' + encodeURIComponent(u.pathname + u.search + u.hash);
+    }
+
     // Foto aceita: só imagem JPEG/PNG/WebP em data URL (nunca endereço de fora, nunca SVG), até ~200 KB.
     function fotoValida(foto) {
         return typeof foto === 'string' && foto.length <= 200000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(foto) ? foto : null;
@@ -322,6 +335,18 @@ p { margin: 0; }
         const est = { aberto: null, animou: null, rolou: false, sistemas: { situacao: 'parado', lista: [] }, termo: '', usuario: undefined, contadores: {} };
         // Dentro do Portal SGE: trocar de sistema, voltar ao início, sair e entrar passam pelo portal (página de cima).
         const portal = SGE.barra._acharPortal();
+        if (!portal) {
+            // Aberto por fora: vai para dentro do portal (um visual só). A marca sge_fora vale para a aba toda.
+            let marcado = false;
+            try {
+                if (new URL(location.href).searchParams.has('sge_fora')) sessionStorage.setItem('sge_fora', '1');
+                marcado = sessionStorage.getItem('sge_fora') === '1';
+            } catch (_) { /* sem sessionStorage: decide só pelo endereço */ }
+            const ir = destinoForaDoPortal(location.href, window.top !== window, marcado);
+            if (ir) SGE.barra._irFora(ir);
+        }
+        // Portal novo (casca Obsidian, versao >= 2): o menu do sistema vai para a árvore do portal e esta barra some.
+        const embutido = !!(portal && portal.versao >= 2 && typeof portal.receberMenu === 'function');
         if (portal) {
             op.aoAbrirSistema = op.aoAbrirSistema || ((slug) => portal.abrir(slug));
             op.aoIrInicio = op.aoIrInicio || (() => portal.inicio());
@@ -333,6 +358,9 @@ p { margin: 0; }
         }
         const host = document.createElement('sge-barra');
         if (portal) Object.entries(COR_NO_PORTAL).forEach(([k, v]) => host.style.setProperty(k, v));
+        // Dentro do portal novo: a barra some e a página ganha a classe sge-embutido (o sistema esconde a barra de
+        // baixo do celular e outros menus próprios: o menu é o do portal).
+        if (embutido) { host.style.display = 'none'; document.documentElement.classList.add('sge-embutido'); }
         const raiz = host.attachShadow({ mode: 'open' });
         const alvo = op.alvo || document.body;
         alvo.insertBefore(host, alvo.firstChild);
@@ -353,6 +381,16 @@ p { margin: 0; }
                 ev.preventDefault();
                 op.aoNavegar(href, ev);
                 setTimeout(() => { if (host.isConnected) desenhar(); }, 0); // SPA: pushState não avisa; marca a tela nova
+            }
+        }
+
+        // Página escolhida no menu em árvore do portal: o sistema troca de tela do jeito dele (SPA) ou recarrega.
+        function irPara(href) {
+            if (op.aoNavegar) {
+                op.aoNavegar(href, { preventDefault() {}, button: 0 });
+                setTimeout(() => { if (host.isConnected) desenhar(); }, 0);
+            } else {
+                location.assign(href);
             }
         }
 
@@ -559,6 +597,12 @@ p { margin: 0; }
             const atual = telaAtual(visiveis, caminho()) || (op.atual ? null : telaAtual(visiveis, location.hash));
             let rotuloAtual = null;
             visiveis.forEach((s) => [s].concat(s.itens || []).forEach((i) => { if (i.href === atual) rotuloAtual = i.rotulo; }));
+            if (embutido) {
+                // Manda as páginas (só rótulo e endereço) e a página aberta para o menu em árvore do portal.
+                const secoesSimples = visiveis.map((s) => ({ rotulo: s.rotulo, href: s.href || null,
+                    itens: s.itens ? s.itens.map((i) => ({ rotulo: i.rotulo, href: i.href })) : null }));
+                try { portal.receberMenu(window, { secoes: secoesSimples, atual, navegar: irPara }); } catch (_) { /* portal fechou */ }
+            }
             host.classList.toggle('transparente', !!op.transparente);
             const vidro = op.transparente ? (est.rolou ? ' fosco' : ' vidro') : '';
             // Clara (portal) só no tema claro; no escuro a barra volta a ser a escura de sempre.
@@ -737,6 +781,7 @@ p { margin: 0; }
         function teclas(ev) {
             if ((ev.ctrlKey || ev.metaKey) && !ev.altKey && (ev.key === 'k' || ev.key === 'K')) {
                 ev.preventDefault();
+                if (embutido && typeof portal.buscar === 'function') { portal.buscar(); return; } // a busca é a do portal
                 buscar();
                 return;
             }
@@ -801,13 +846,14 @@ p { margin: 0; }
     }
 
     SGE.barra = {
-        versao: '1.5.0',
+        versao: '1.6.0',
         // Portal SGE na página de cima (mesmo endereço); fora dele, ou em outro endereço, devolve null.
         _acharPortal() {
             try { return window.top !== window && window.top.SGEPortal ? window.top.SGEPortal : null; } catch (_) { return null; }
         },
         montar,
-        _regras: { enderecoNoPortal, agruparPorArea, prepararSistemas, telaAtual, secoesVisiveis, iniciais, fotoValida },
+        _irFora: (url) => window.location.replace(url), // leva para dentro do portal (substituível nos testes)
+        _regras: { enderecoNoPortal, agruparPorArea, prepararSistemas, telaAtual, secoesVisiveis, iniciais, fotoValida, destinoForaDoPortal },
     };
     if (window.SGECore) window.SGECore.barra = SGE.barra;
 })();

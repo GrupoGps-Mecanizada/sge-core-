@@ -1,0 +1,237 @@
+/**
+ * SGE KIT v1 — as peças de tela do padrão visual SGE (aprovado pelo dono em 16-17/11/2026).
+ * Modelos: Produtividade da Frota (FERRAMENTAS-MECANIZADA/produtividade) e piloto do Mapa das Varredeiras.
+ * Uso: depois do sge-core.css →  <link rel="stylesheet" href="/sge-core-/v1/sge-kit.css">
+ * Tudo começa com "k-" e usa só as cores do sge-core (--sge-*): troca de tema claro/escuro junto.
+ * Vitrine com cada peça funcionando: sge-core/kit.html
+ */
+:root {
+    --k-trilho: #ecebe7;          /* fundo das barras */
+    --k-escuro: #1f1e1b;          /* botão escolhido (faixa de filtros) */
+    --k-sombra: 0 1px 2px rgba(0, 0, 0, .05);
+}
+:root[data-tema="escuro"] { --k-trilho: #2a2a27; --k-escuro: #eeeeec; --k-sombra: none; }
+
+/* ── 1. Faixa de filtros (no alto da tela) ─────────────── */
+.k-faixa { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; padding: 8px 12px; background: var(--sge-superficie);
+    border: 1px solid var(--sge-borda); border-radius: 14px; box-shadow: var(--k-sombra); font-family: var(--sge-fonte); }
+.k-faixa .k-fim { margin-left: auto; font-size: 12px; color: var(--sge-texto-3); }
+.k-rot { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--sge-texto-3); }
+.k-grupo { display: inline-flex; align-items: center; gap: 8px; }
+
+/* botões de escolha (Todas / 01 / 06…): o escolhido fica escuro */
+.k-seg { display: inline-flex; align-items: center; gap: 2px; padding: 3px; background: var(--sge-superficie-2); border: 1px solid var(--sge-borda); border-radius: 10px; }
+.k-seg button { height: 28px; padding: 0 11px; border: 0; background: none; border-radius: 7px; color: var(--sge-texto-2); font: 500 13px var(--sge-fonte); cursor: pointer; white-space: nowrap; }
+.k-seg button:hover { color: var(--sge-texto); }
+.k-seg button.on, .k-seg button[aria-pressed="true"] { background: var(--k-escuro); color: var(--sge-superficie); font-weight: 600; }
+
+/* escolha em azul (dentro das opções) */
+.k-seg-azul { display: flex; border: 1px solid var(--sge-destaque); border-radius: 8px; overflow: hidden; }
+.k-seg-azul button { flex: 1; height: 26px; padding: 0 8px; border: 0; background: none; font: 12px var(--sge-fonte); color: var(--sge-texto-2); cursor: pointer; white-space: nowrap; }
+.k-seg-azul button + button { border-left: 1px solid var(--sge-destaque-suave); }
+.k-seg-azul button.on { background: var(--sge-destaque); color: #fff; font-weight: 600; }
+
+/* botões */
+.k-bt { height: 32px; padding: 0 12px; border: 1px solid var(--sge-borda); border-radius: 8px; background: var(--sge-superficie); color: var(--sge-texto);
+    font: 500 13px var(--sge-fonte); display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; cursor: pointer; }
+.k-bt:hover { background: var(--sge-superficie-2); }
+.k-bt.pri { background: var(--sge-destaque); color: #fff; border-color: transparent; }
+.k-bt.pri:hover { filter: brightness(1.08); }
+.k-bt.sm { height: 26px; padding: 0 8px; font-size: 12.5px; }
+.k-bt svg { width: 16px; height: 16px; }
+.k-seta { width: 32px; padding: 0; justify-content: center; }
+/* botão de período: ícone de calendário + "Período · 16/10 a 15/11" + setinha */
+.k-periodo { min-width: 200px; }
+.k-periodo .k-pt { color: var(--sge-texto-3); font-weight: 400; }
+.k-periodo b { flex: 1; text-align: left; font-weight: 600; }
+
+/* interruptor */
+.k-sw { appearance: none; -webkit-appearance: none; width: 32px; height: 18px; border-radius: 9px; background: var(--sge-borda); position: relative; cursor: pointer; margin: 0; flex: none; transition: background .15s; }
+.k-sw:checked { background: var(--sge-destaque); }
+.k-sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: left .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.k-sw:checked::after { left: 16px; }
+
+/* ── 2. Cartões de números (no alto) ───────────────────── */
+.k-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.k-kpi { background: var(--sge-superficie); border: 1px solid var(--sge-borda); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; box-shadow: var(--k-sombra); font-family: var(--sge-fonte); }
+.k-kpi small { font-size: 12.5px; color: var(--sge-texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.k-kpi b { font-size: 22px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--sge-texto); }
+.k-kpi em { font-style: normal; font-size: 12px; color: var(--sge-texto-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── 3. Cartão de conteúdo (gráfico, lista, tabela) ────── */
+.k-cartao { background: var(--sge-superficie); border: 1px solid var(--sge-borda); border-radius: 14px; padding: 14px 16px; min-width: 0; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--k-sombra); font-family: var(--sge-fonte); color: var(--sge-texto); }
+.k-cartao > h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.k-cartao > h3 small { font-weight: 400; font-size: 12.5px; color: var(--sge-texto-3); }
+.k-diz { margin: -4px 0 0; font-size: 13px; color: var(--sge-texto-2); }
+.k-diz b { color: var(--sge-texto); }
+.k-grade { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 10px; align-items: start; }
+.k-pilha { display: flex; flex-direction: column; gap: 10px; }
+
+/* legenda com cores (no canto do cartão) */
+.k-legenda { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--sge-texto-2); }
+.k-legenda span { display: inline-flex; align-items: center; gap: 6px; }
+.k-q { display: inline-block; width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+/* ── 4. Composição (barra 100% + cartõezinhos com %) ───── */
+.k-comp { display: flex; height: 28px; border-radius: 7px; overflow: hidden; gap: 2px; background: var(--k-trilho); }
+.k-comp i { display: block; height: 100%; }
+.k-comp-itens { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
+.k-comp-item { display: grid; grid-template-columns: 10px 1fr auto; grid-template-rows: auto auto; column-gap: 8px; align-items: center; text-align: left;
+    border: 1px solid var(--sge-borda); background: var(--sge-superficie); border-radius: 10px; padding: 7px 10px; font: inherit; color: inherit; cursor: pointer; }
+.k-comp-item:hover { background: var(--sge-superficie-2); }
+.k-comp-item.on { border-color: var(--sge-destaque); box-shadow: inset 0 0 0 1px var(--sge-destaque); }
+.k-comp-item i { width: 10px; height: 10px; border-radius: 3px; grid-row: 1 / 3; }
+.k-comp-item span { font-size: 12.5px; color: var(--sge-texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.k-comp-item b { font-size: 15px; font-weight: 600; grid-row: 1 / 3; grid-column: 3; font-variant-numeric: tabular-nums; }
+.k-comp-item small { font-size: 11.5px; color: var(--sge-texto-3); }
+
+/* ── 5. Ranking por linha (nome · barra · valor) ───────── */
+.k-rank { display: flex; flex-direction: column; gap: 1px; }
+.k-rank-l { display: grid; grid-template-columns: minmax(110px, 190px) minmax(0, 1fr) 72px; gap: 10px; align-items: center; padding: 4px 6px; border-radius: 7px; font-size: 13px; }
+.k-rank-l[data-ir] { cursor: pointer; }
+.k-rank-l[data-ir]:hover { background: var(--sge-superficie-2); }
+.k-rank-l .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-rank-l .n b { font-weight: 600; }
+.k-rank-l .n small { color: var(--sge-texto-3); }
+.k-barra { display: flex; height: 12px; border-radius: 3px; overflow: hidden; gap: 1px; background: var(--k-trilho); }
+.k-barra i { display: block; height: 100%; }
+.k-rank-l .v { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ── 6. Colunas por dia (empilhadas) ───────────────────── */
+.k-colunas { display: flex; align-items: flex-end; gap: 3px; height: 180px; }
+.k-col { flex: 1; display: flex; flex-direction: column-reverse; height: 100%; min-width: 4px; border-radius: 3px 3px 0 0; overflow: hidden; cursor: pointer; }
+.k-col:hover { outline: 2px solid var(--sge-destaque); outline-offset: 1px; }
+.k-col i { display: block; }
+.k-eixo { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--sge-texto-3); }
+
+/* ── 7. Tabela (linhas entre colunas, cabeçalho preso, funil do Excel) ── */
+.k-tab-cx { overflow: auto; border: 1px solid var(--sge-borda); border-radius: 14px; background: var(--sge-superficie); }
+table.k-tab { border-collapse: separate; border-spacing: 0; width: 100%; font: 13.5px var(--sge-fonte); font-variant-numeric: tabular-nums; color: var(--sge-texto); }
+table.k-tab th { position: sticky; top: 0; z-index: 2; background: var(--sge-superficie-2); text-align: left; font-weight: 600; color: var(--sge-texto-2); font-size: 12.5px;
+    padding: 8px 10px; border-bottom: 1px solid var(--sge-borda); border-right: 1px solid var(--sge-borda); white-space: nowrap; user-select: none; }
+table.k-tab td { padding: 6px 10px; border-bottom: 1px solid var(--sge-borda); border-right: 1px solid var(--sge-borda); white-space: nowrap; background: var(--sge-superficie); }
+table.k-tab th:last-child, table.k-tab td:last-child { border-right: 0; }
+table.k-tab .num { text-align: right; }
+table.k-tab tbody tr { cursor: pointer; }
+table.k-tab tbody tr:hover td { background: var(--sge-superficie-2); }
+table.k-tab tbody tr.sel td { background: var(--sge-destaque-suave) !important; }
+table.k-tab tfoot td { position: sticky; bottom: 0; background: var(--sge-superficie-2); border-top: 1px solid var(--sge-borda); font-weight: 600; }
+.k-th { display: inline-flex; align-items: center; gap: 6px; width: 100%; }
+.k-funil { border: 0; background: none; width: 22px; height: 22px; border-radius: 7px; display: inline-grid; place-items: center; color: var(--sge-texto-3); opacity: 0; margin-left: auto; cursor: pointer; }
+th:hover .k-funil { opacity: .7; }
+.k-funil:hover { background: var(--sge-superficie-2); color: var(--sge-texto); }
+.k-funil.on { opacity: 1; background: var(--sge-destaque); color: #fff; }
+.k-funil svg { width: 14px; height: 14px; }
+
+/* filtro igual ao Excel (abre no funil) */
+.k-excel { position: fixed; z-index: 60; background: var(--sge-superficie); border: 1px solid var(--sge-borda); border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,.14);
+    padding: 6px; width: 270px; display: flex; flex-direction: column; gap: 4px; font: 13px var(--sge-fonte); color: var(--sge-texto); }
+.k-excel .k-ord { display: flex; gap: 4px; }
+.k-excel .k-ord button { flex: 1; border: 1px solid var(--sge-borda); border-radius: 8px; background: none; padding: 5px 6px; font: 12.5px var(--sge-fonte); cursor: pointer; color: inherit; }
+.k-excel input[type=search] { height: 30px; border: 1px solid var(--sge-borda); border-radius: 8px; padding: 0 9px; background: var(--sge-superficie); color: inherit; margin: 2px 0; }
+.k-excel .k-valores { max-height: 240px; overflow: auto; border: 1px solid var(--sge-borda); border-radius: 8px; padding: 2px; }
+.k-excel label { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 7px; cursor: pointer; }
+.k-excel label:hover { background: var(--sge-superficie-2); }
+.k-excel input[type=checkbox] { accent-color: var(--sge-destaque); }
+.k-excel .k-ok { display: flex; gap: 6px; justify-content: flex-end; padding-top: 4px; }
+
+/* selos de status (cor só para status) */
+.k-selo { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 500; background: var(--sge-superficie-2); color: var(--sge-texto-2); white-space: nowrap; }
+.k-selo::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .8; }
+.k-selo.ok { background: #e6f6eb; color: #1d6b38; }
+.k-selo.al { background: #fff1c2; color: #7a5900; }
+.k-selo.ru { background: #fde0de; color: #a3221c; }
+:root[data-tema="escuro"] .k-selo.ok { background: #14301f; color: #6fd49a; }
+:root[data-tema="escuro"] .k-selo.al { background: #33290b; color: #f2c94c; }
+:root[data-tema="escuro"] .k-selo.ru { background: #3b1517; color: #ff9a94; }
+
+/* ── 8. Opções: botão azul preso no canto + coluna de opções em seções ── */
+.k-com-opcoes { position: relative; }
+.k-opcoes-bt { position: absolute; top: 8px; right: 8px; z-index: 6; width: 32px; height: 32px; border-radius: 9px; border: 0; background: var(--sge-destaque); color: #fff;
+    display: grid; place-items: center; box-shadow: 0 2px 6px rgba(47, 95, 179, .35); cursor: pointer; }
+.k-opcoes-bt:hover { filter: brightness(1.1); }
+.k-opcoes-bt svg { width: 18px; height: 18px; }
+.k-opcoes { width: 290px; flex: none; border: 1px solid var(--sge-borda); border-radius: 14px; background: var(--sge-superficie); display: flex; flex-direction: column; overflow: auto; font: 13px var(--sge-fonte); color: var(--sge-texto); }
+.k-opcoes[hidden] { display: none; }
+.k-opcoes .k-oh { height: 42px; display: flex; align-items: center; padding: 0 48px 0 12px; font-weight: 600; border-bottom: 1px solid var(--sge-borda); background: var(--sge-destaque-suave); color: var(--sge-destaque); border-radius: 14px 14px 0 0; }
+.k-sec { margin: 6px 10px; border: 1px solid var(--sge-borda); border-radius: 12px; overflow: hidden; }
+.k-sec > summary { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--sge-superficie-2); cursor: pointer; list-style: none; }
+.k-sec > summary::-webkit-details-marker { display: none; }
+.k-sec[open] > summary { background: var(--sge-destaque-suave); }
+.k-sec .k-num { font-size: 11.5px; font-weight: 700; color: var(--sge-destaque); min-width: 16px; }
+.k-sec .k-tt { font-weight: 600; flex: 1; }
+.k-op { display: flex; align-items: center; gap: 10px; padding: 6px 12px; }
+.k-op:hover { background: var(--sge-superficie-2); }
+.k-op .k-tx { flex: 1; min-width: 0; }
+.k-op .k-tx small { display: block; font-size: 11.5px; color: var(--sge-texto-3); }
+.k-op.col { flex-direction: column; align-items: stretch; gap: 6px; }
+.k-op select, .k-op input[type=date] { height: 30px; border: 1px solid var(--sge-borda); border-radius: 8px; background: var(--sge-superficie); color: inherit; padding: 0 8px; font: 13px var(--sge-fonte); }
+.k-opcoes .k-rodape { display: flex; gap: 6px; padding: 10px 10px 14px; margin-top: auto; }
+.k-opcoes .k-rodape .pri { flex: 1; justify-content: center; }
+
+/* ── 9. Painel ao lado (encaixado, expande e retrai) ───── */
+.k-lado { width: 460px; flex: none; border: 1px solid var(--sge-borda); border-radius: 14px; background: var(--sge-superficie); display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--k-sombra); font: 13px var(--sge-fonte); color: var(--sge-texto); }
+.k-lado[hidden] { display: none; }
+.k-lado-h { display: flex; align-items: center; gap: 6px; padding: 12px 12px 10px 16px; border-bottom: 1px solid var(--sge-borda); }
+.k-lado-h b { font-size: 16px; font-weight: 600; flex: 1; }
+.k-kv { display: grid; grid-template-columns: 130px 1fr; gap: 5px 10px; margin: 0; padding: 12px 16px; border-bottom: 1px solid var(--sge-borda); }
+.k-kv dt { color: var(--sge-texto-2); } .k-kv dd { margin: 0; }
+.k-abas { display: flex; gap: 2px; padding: 0 10px; border-bottom: 1px solid var(--sge-borda); overflow-x: auto; }
+.k-abas button { border: 0; background: none; padding: 9px 8px; color: var(--sge-texto-2); font: 500 13px var(--sge-fonte); white-space: nowrap; cursor: pointer; }
+.k-abas button.on { color: var(--sge-destaque); box-shadow: inset 0 -2px 0 var(--sge-destaque); }
+.k-lado-c { flex: 1; overflow: auto; padding: 14px 16px; }
+.k-puxa { width: 10px; flex: none; cursor: col-resize; position: relative; }
+.k-puxa::after { content: ""; position: absolute; left: 4px; top: 50%; width: 2px; height: 36px; margin-top: -18px; border-radius: 2px; background: var(--sge-borda); }
+.k-puxa:hover::after { background: var(--sge-destaque); height: 60px; margin-top: -30px; }
+
+/* ── 10. "O que mudou nesta tela" (quadro preso no canto) ── */
+.k-mudou { position: fixed; right: 16px; top: 12px; z-index: 50; width: 330px; background: var(--sge-superficie); border: 1px solid var(--sge-borda); border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .14); font: 13px var(--sge-fonte); color: var(--sge-texto); }
+.k-mudou > summary { display: flex; align-items: center; gap: 8px; padding: 12px 14px; font-weight: 600; cursor: pointer; list-style: none; }
+.k-mudou > summary::-webkit-details-marker { display: none; }
+.k-mudou > summary span { color: var(--sge-texto-3); font-weight: 500; }
+.k-mudou ol { margin: 0; padding: 0 14px 12px 32px; max-height: 50vh; overflow: auto; color: var(--sge-texto-2); }
+.k-mudou li { margin: 4px 0; }
+
+/* ── 11. Tela planilha: tudo encostado, sem espaço entre os blocos (Portfólio 26, opção E, 17/11/2026) ──
+   <div class="k-planilha"> com os blocos dentro. Linhas finas separam; o título de cada bloco fica numa faixa cinza.
+   Grades de blocos lado a lado: <div class="k-planilha-grade" style="grid-template-columns:2fr 1fr">. */
+.k-planilha, .k-planilha-grade { display: grid; gap: 1px; background: var(--sge-borda); font-family: var(--sge-fonte); }
+.k-planilha { border-bottom: 1px solid var(--sge-borda); }
+.k-bloco { background: var(--sge-superficie); min-width: 0; }
+.k-bloco-tit { display: flex; align-items: center; gap: 10px; padding: 7px 12px; background: var(--sge-superficie-2); border-bottom: 1px solid var(--sge-borda);
+    font-size: 13px; font-weight: 600; color: var(--sge-texto); }
+.k-bloco-tit .k-fim { margin-left: auto; }
+.k-bloco-num { padding: 8px 12px 10px; }
+.k-bloco-num b { display: block; font-size: 22px; font-weight: 600; color: var(--sge-texto); }
+
+/* ── 12. Ajuda (?): a tela fica limpa; o botão mostra ou esconde todas as explicações (Portfólio 27, opção D) ──
+   Regra do dono (17/11/2026): nada de subtítulos, legendas soltas e avisos escritos à mostra.
+   Todo texto que explica vai em <span class="k-explica">; o botão <button class="k-ajuda" data-k-ajuda>?</button>
+   liga/desliga a classe k-ajuda-on no <html> (sge-core.js faz isso sozinho e lembra a escolha). */
+.k-explica { display: none; }
+.k-ajuda-on .k-explica { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; color: var(--sge-destaque); }
+.k-ajuda { width: 28px; height: 28px; flex: none; border-radius: 50%; border: 1px solid var(--sge-borda-forte, var(--sge-borda)); background: var(--sge-superficie);
+    color: var(--sge-texto-2); font: 700 13px var(--sge-fonte); cursor: pointer; }
+.k-ajuda-on .k-ajuda { background: var(--sge-destaque); border-color: transparent; color: #fff; }
+
+/* ── 13. Avisos em selo (no lugar das faixas escritas) e legenda no cabeçalho da coluna ── */
+.k-aviso { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--sge-borda);
+    background: var(--sge-superficie); color: var(--sge-texto); font: 600 12px var(--sge-fonte); cursor: pointer; white-space: nowrap; }
+.k-aviso.ru { background: #fdecea; border-color: #f3c4bf; color: #8a1408; }
+.k-aviso.al { background: #fff6d6; border-color: #f1dc93; color: #5e3f00; }
+:root[data-tema="escuro"] .k-aviso.ru { background: #45140f; border-color: #6b2219; color: #ffaa9f; }
+:root[data-tema="escuro"] .k-aviso.al { background: #3d2e05; border-color: #5c4610; color: #ffd479; }
+.k-pt { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+
+/* barra de rolar fina e arredondada (como nos modelos) */
+.k-rolagem::-webkit-scrollbar, .k-tab-cx::-webkit-scrollbar { width: 12px; height: 12px; }
+.k-rolagem::-webkit-scrollbar-thumb, .k-tab-cx::-webkit-scrollbar-thumb { background: var(--sge-borda); border-radius: 999px; border: 4px solid transparent; background-clip: content-box; }
+
+@media (max-width: 760px) {
+    .k-grade, .k-planilha-grade { grid-template-columns: 1fr !important; }
+    .k-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .k-rank-l { grid-template-columns: minmax(90px, 130px) minmax(0, 1fr) 56px; }
+    .k-lado, .k-opcoes { position: fixed; inset: 0; width: auto; z-index: 30; border-radius: 0; }
+    .k-mudou { left: 8px; right: 8px; width: auto; }
+}

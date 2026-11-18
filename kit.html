@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kit de peças · padrão SGE</title>
+<link rel="stylesheet" href="v1/sge-core.css">
+<link rel="stylesheet" href="v1/sge-kit.css">
+<style>
+/* só a moldura da vitrine (não faz parte do kit) */
+body{margin:0;background:var(--sge-fundo);font-family:var(--sge-fonte);color:var(--sge-texto)}
+.vit{max-width:1280px;margin:0 auto;padding:18px 18px 80px;display:flex;flex-direction:column;gap:12px}
+.vit h1{font-size:18px;margin:0}.vit .sub{color:var(--sge-texto-2);margin:0 0 6px;font-size:13px}
+.peca{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sge-destaque);margin:16px 0 -4px}
+.lay{display:flex;gap:10px;min-height:360px}
+.lay .k-cartao{flex:1}
+.topo-vit{display:flex;gap:10px;align-items:center}
+.vit~.k-mudou{top:auto;bottom:16px}
+</style>
+</head>
+<body>
+<div class="vit">
+<div class="topo-vit"><div style="flex:1"><h1>Kit de peças · padrão visual SGE</h1><p class="sub">Peças tiradas da Produtividade da Frota e do piloto do Mapa das Varredeiras. Todo sistema passa a usar estas mesmas peças. Dados inventados; clique para ver funcionando.</p></div>
+<button class="k-bt" id="tema">Tema escuro</button></div>
+
+<div class="peca">1 · Faixa de filtros</div>
+<div class="k-faixa">
+  <button class="k-bt k-seta" aria-label="Anterior">‹</button>
+  <button class="k-bt k-periodo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="k-pt">Período ·</span><b>16/10 a 15/11</b>▾</button>
+  <button class="k-bt k-seta" aria-label="Próximo">›</button>
+  <span class="k-grupo"><span class="k-rot">Equipamento</span><span class="k-seg" data-seg><button class="on">Todos</button><button>AP</button><button>AV</button><button>HV</button></span></span>
+  <span class="k-grupo"><span class="k-rot">Turno</span><span class="k-seg" data-seg><button class="on">Os dois</button><button>1º turno</button><button>2º turno</button></span></span>
+  <span class="k-fim">Dados até 17/11 às 14:30</span>
+</div>
+
+<div class="peca">11 a 13 · Tela planilha (tudo encostado) + botão (?) de ajuda + avisos em selo + legenda no cabeçalho — clique no (?)</div>
+<div class="k-planilha" style="margin-bottom:18px">
+  <div class="k-bloco" style="display:flex;align-items:center;gap:8px;padding:6px 10px"><span class="k-seg" data-seg><button class="on">Hoje</button><button>Mapas</button></span><span style="flex:1"></span><span class="k-aviso ru"><i class="k-pt" style="background:#c8372d;margin:0"></i>18 críticos</span><span class="k-aviso al"><i class="k-pt" style="background:#d4a017;margin:0"></i>49 atenção</span><button class="k-ajuda" data-k-ajuda title="Mostrar ou esconder as explicações">?</button></div>
+  <div class="k-planilha-grade" style="grid-template-columns:repeat(3,1fr)">
+    <div class="k-bloco"><div class="k-bloco-tit"><div>Liberados para trabalhar<span class="k-explica">sem nada vencido ou sem registro</span></div></div><div class="k-bloco-num"><b>119 de 154</b></div></div>
+    <div class="k-bloco"><div class="k-bloco-tit"><div>Requisitos em dia<span class="k-explica">cai para 84% em 90 dias sem ação</span></div></div><div class="k-bloco-num"><b>94%</b></div></div>
+    <div class="k-bloco"><div class="k-bloco-tit"><div>Com requisito vencido<span class="k-explica">pessoas com pelo menos 1 requisito a renovar</span></div></div><div class="k-bloco-num"><b style="color:#a32116">27</b></div></div>
+  </div>
+  <div class="k-bloco"><div class="k-bloco-tit"><div>Onde agir primeiro<span class="k-explica">Vencidos primeiro (risco real), depois os que vencem logo, depois os sem registro.</span></div></div>
+    <table class="k-tab"><thead><tr><th>Requisito</th><th class="num"><i class="k-pt" style="background:#c8372d"></i>Vencido</th><th class="num"><i class="k-pt" style="background:#d4a017"></i>Vence</th><th class="num"><i class="k-pt" style="background:#a7abb0"></i>Sem registro</th></tr></thead>
+    <tbody><tr><td><b>PO Usiminas</b></td><td class="num">22</td><td class="num">—</td><td class="num">13</td></tr><tr><td><b>ASO</b></td><td class="num">2</td><td class="num">16</td><td class="num">7</td></tr></tbody></table></div>
+</div>
+
+<div class="peca">2 · Cartões de números</div>
+<div class="k-kpis">
+  <div class="k-kpi"><small>Horas com caminhão na vaga</small><b>11.896 h</b><em>de 14.233 h de regime</em></div>
+  <div class="k-kpi"><small>Vaga sem caminhão</small><b>16,4%</b><em>2.337 h fora da conta</em></div>
+  <div class="k-kpi"><small>Com apontamento no tablet</small><b>18,3%</b><em>2.171 h</em></div>
+  <div class="k-kpi"><small>Equipamentos</small><b>22</b><em>22 com caminhão no período</em></div>
+</div>
+
+<div class="peca">3 · Composição (barra 100% + legenda clicável)</div>
+<div class="k-cartao"><h3>Status do motor da frota</h3>
+  <div class="k-comp"><i style="width:19.3%;background:#3f8a5c"></i><i style="width:9.7%;background:#d6b44a"></i><i style="width:5.2%;background:#9cc9a8"></i><i style="width:39.1%;background:#c45a4f"></i><i style="width:9.6%;background:#4f6496"></i><i style="width:13.6%;background:#d9934f"></i><i style="width:3.5%;background:#6b6b6b"></i></div>
+  <div class="k-comp-itens">
+    <button class="k-comp-item on"><i style="background:#3f8a5c"></i><span>Ligado</span><b>19,3%</b><small>2.299 h</small></button>
+    <button class="k-comp-item"><i style="background:#d6b44a"></i><span>Parado ligado</span><b>9,7%</b><small>1.151 h</small></button>
+    <button class="k-comp-item"><i style="background:#c45a4f"></i><span>Desligado</span><b>39,1%</b><small>4.653 h</small></button>
+    <button class="k-comp-item"><i style="background:#d9934f"></i><span>Manutenção</span><b>13,6%</b><small>1.617 h</small></button>
+  </div>
+</div>
+
+<div class="peca">4 · Ranking por linha + colunas por dia</div>
+<div class="k-grade">
+  <div class="k-cartao"><h3>Status por equipamento <small>· mais ligado primeiro</small></h3>
+    <div class="k-rank" id="rank"></div>
+  </div>
+  <div class="k-cartao"><h3>Para onde foi cada dia</h3><p class="k-diz">Em média, cada turno teve <b>3h09</b> varrendo. O melhor dia foi <b>seg 02/11</b>.</p>
+    <div class="k-legenda"><span><i class="k-q" style="background:#2e7d32"></i>Trabalhando</span><span><i class="k-q" style="background:#e88aa8"></i>Parado ligado</span><span><i class="k-q" style="background:#3d7bd8"></i>Deslocamento</span><span><i class="k-q" style="background:#c9c8c3"></i>Desligado</span></div>
+    <div class="k-colunas" id="colunas"></div><div class="k-eixo"><span>16/10</span><span>01/11</span><span>15/11</span></div>
+  </div>
+</div>
+
+<div class="peca">5 · Tabela + botão azul de opções + filtro do Excel + painel ao lado (clique numa linha; passe o mouse no cabeçalho)</div>
+<div class="lay">
+  <div class="k-cartao k-com-opcoes" style="padding:0;gap:0">
+    <button class="k-opcoes-bt" id="opBt" title="Opções da planilha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
+    <div class="k-tab-cx" style="border:0;border-radius:14px;flex:1">
+      <table class="k-tab"><thead><tr><th><span class="k-th">Equipamento<button class="k-funil" data-funil><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16l-6 8v5l-4 2v-7z"/></svg></button></span></th><th><span class="k-th">Supervisor<button class="k-funil" data-funil><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16l-6 8v5l-4 2v-7z"/></svg></button></span></th><th>Situação</th><th class="num">Horas ligado</th></tr></thead>
+      <tbody id="tbody"></tbody></table>
+    </div>
+  </div>
+  <aside class="k-opcoes" id="opcoes" hidden>
+    <div class="k-oh">Opções da planilha</div>
+    <details class="k-sec" open><summary><span class="k-num">1</span><span class="k-tt">Exibição</span></summary>
+      <label class="k-op"><span class="k-tx">Linhas compactas<small>mais linhas na tela</small></span><input type="checkbox" class="k-sw" checked></label>
+      <div class="k-op col"><span class="k-tx">Medida</span><div class="k-seg-azul" data-seg><button class="on">Horas</button><button>%</button><button>Dias</button></div></div></details>
+    <details class="k-sec"><summary><span class="k-num">2</span><span class="k-tt">Quem aparece</span></summary><label class="k-op"><span class="k-tx">Mostrar desmobilizados</span><input type="checkbox" class="k-sw"></label></details>
+    <details class="k-sec"><summary><span class="k-num">3</span><span class="k-tt">Colunas</span></summary><label class="k-op"><span class="k-tx">Supervisor</span><input type="checkbox" class="k-sw" checked></label></details>
+    <div class="k-rodape"><button class="k-bt">Padrão</button><button class="k-bt pri">Exportar como está</button></div>
+  </aside>
+  <div class="k-puxa" id="puxa" hidden></div>
+  <aside class="k-lado" id="lado" hidden>
+    <div class="k-lado-h"><b id="ladoT"></b><button class="k-bt sm" id="ladoX">Fechar</button></div>
+    <dl class="k-kv" id="ladoKv"></dl>
+    <div class="k-abas" data-abas><button class="on">Resumo</button><button>Histórico</button><button>Fotos</button></div>
+    <div class="k-lado-c"><p class="k-diz">Conteúdo da aba escolhida.</p></div>
+  </aside>
+</div>
+
+<div class="peca">6 · Selos de status</div>
+<div class="k-faixa"><span class="k-selo ok">Em dia</span><span class="k-selo al">Vence em 30 dias</span><span class="k-selo ru">Vencido</span><span class="k-selo">Sem registro</span></div>
+</div>
+
+<details class="k-mudou" open><summary>O que mudou nesta tela <span>(3)</span></summary><ol><li>Filtros numa faixa só, no alto.</li><li>Números do topo em cartões.</li><li>Opções da planilha no botão azul.</li></ol></details>
+
+<script>
+const EQ = [['AV 04', 'Donizete', 'ok', 'Em dia', 32.6], ['AV 06', 'Genésio', 'al', 'Vence em 30 dias', 32.2], ['AP 03', 'Junior', 'ok', 'Em dia', 27.3], ['HV 01', 'Donizete', 'ru', 'Vencido', 20.7], ['AP 09', 'Turno 16h', 'ok', 'Em dia', 16.5], ['AS 02', 'Genésio', '', 'Sem registro', 12.8]];
+const CORES = ['#3f8a5c', '#d6b44a', '#c45a4f', '#4f6496', '#d9934f', '#6b6b6b'];
+const fatias = (s) => { let r = s, out = []; for (let k = 0; k < 6; k++) { const v = k === 5 ? r : Math.max(4, ((s * (k + 3) * 7) % 30)); out.push(Math.min(v, r)); r -= Math.min(v, r); } return out; };
+document.getElementById('rank').innerHTML = EQ.map(([n, sup, , , v]) => `<div class="k-rank-l" data-ir><span class="n"><b>${n}</b> <small>${sup}</small></span><span class="k-barra">${fatias(Math.round(v * 3)).map((f, i) => `<i style="width:${f}%;background:${CORES[i]}"></i>`).join('')}</span><span class="v">${v.toLocaleString('pt-BR')}%</span></div>`).join('');
+document.getElementById('colunas').innerHTML = Array.from({ length: 31 }, (_, d) => { const t = 30 + ((d * 37) % 60), a = (d * 13) % 18, b = (d * 7) % 10, c = 8 + (d * 5) % 12; return `<div class="k-col" title="dia ${d + 1}"><i style="height:${a}%;background:#2e7d32"></i><i style="height:${b}%;background:#e88aa8"></i><i style="height:${c / 2}%;background:#3d7bd8"></i><i style="height:${t - a - b}%;background:#c9c8c3"></i></div>`; }).join('');
+document.getElementById('tbody').innerHTML = EQ.map(([n, sup, c, s, v]) => `<tr data-n="${n}" data-sup="${sup}" data-s="${s}"><td><b>${n}</b></td><td>${sup}</td><td><span class="k-selo ${c}">${s}</span></td><td class="num">${(v * 41).toFixed(0)} h</td></tr>`).join('');
+document.querySelectorAll('[data-seg]').forEach((g) => g.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; g.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); }));
+document.querySelectorAll('[data-abas]').forEach((g) => g.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; g.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); }));
+document.querySelectorAll('.k-comp-item').forEach((b) => b.onclick = () => document.querySelectorAll('.k-comp-item').forEach((x) => x.classList.toggle('on', x === b)));
+document.getElementById('opBt').onclick = () => { const o = document.getElementById('opcoes'); o.hidden = !o.hidden; };
+document.getElementById('tbody').onclick = (e) => { const tr = e.target.closest('tr'); if (!tr) return; document.querySelectorAll('#tbody tr').forEach((x) => x.classList.toggle('sel', x === tr));
+  document.getElementById('ladoT').textContent = tr.dataset.n; document.getElementById('ladoKv').innerHTML = `<dt>Supervisor</dt><dd>${tr.dataset.sup}</dd><dt>Situação</dt><dd>${tr.dataset.s}</dd>`;
+  document.getElementById('lado').hidden = false; document.getElementById('puxa').hidden = false; };
+document.getElementById('ladoX').onclick = () => { document.getElementById('lado').hidden = true; document.getElementById('puxa').hidden = true; document.querySelectorAll('#tbody tr').forEach((x) => x.classList.remove('sel')); };
+/* filtro igual ao Excel (só a aparência e o abre/fecha na vitrine) */
+document.querySelectorAll('[data-funil]').forEach((f, col) => f.onclick = (e) => {
+  e.stopPropagation(); document.querySelectorAll('.k-excel').forEach((m) => m.remove());
+  const vals = [...new Set(EQ.map((x) => x[col]))].sort();
+  const m = document.createElement('div'); m.className = 'k-excel'; const r = f.getBoundingClientRect(); m.style.left = Math.min(r.left, innerWidth - 290) + 'px'; m.style.top = (r.bottom + 6) + 'px';
+  m.innerHTML = `<div class="k-ord"><button>A → Z</button><button>Z → A</button></div><input type="search" placeholder="Pesquisar"><div class="k-valores"><label><input type="checkbox" checked> <b>(Selecionar tudo)</b></label>${vals.map((v) => `<label><input type="checkbox" checked> ${v}</label>`).join('')}</div><div class="k-ok"><button class="k-bt sm">Cancelar</button><button class="k-bt sm pri">OK</button></div>`;
+  document.body.appendChild(m); f.classList.add('on'); m.querySelectorAll('.k-ok button').forEach((b) => b.onclick = () => { m.remove(); f.classList.remove('on'); });
+});
+document.addEventListener('click', (e) => { if (!e.target.closest('.k-excel')) { document.querySelectorAll('.k-excel').forEach((m) => m.remove()); document.querySelectorAll('[data-funil]').forEach((f) => f.classList.remove('on')); } });
+document.getElementById('tema').onclick = (e) => { const d = document.documentElement.getAttribute('data-tema') === 'escuro'; document.documentElement.setAttribute('data-tema', d ? 'claro' : 'escuro'); e.target.textContent = d ? 'Tema escuro' : 'Tema claro'; };
+document.documentElement.setAttribute('data-tema', 'claro');
+/* na vitrine o botão (?) liga direto (nos sistemas quem faz isso é o sge-core.js) */
+document.querySelectorAll('[data-k-ajuda]').forEach((b) => b.onclick = () => document.documentElement.classList.toggle('k-ajuda-on'));
+</script>
+</body>
+</html>

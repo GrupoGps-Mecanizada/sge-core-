@@ -1,5 +1,25 @@
 # Mudanças do SGE Core
 
+## v1.14.1 · 2026-11-18 · logo do carregando + portal antigo recarrega (publicada 18/11/2026, junto com 1.13 e 1.14)
+- `SGE.carregando()` tela cheia: sai a marca em texto e a linha de etapas; entra a **logo do Grupo GPS enchendo de azul** (a do Controle de Medições) com a **logo do sge embaixo** + texto da etapa (dono, 18/11/2026, opção A). Logos dentro do CSS (não dependem de outro arquivo). Linha fina (`data-sge-carregando`) e "salvando no botão" continuam iguais.
+- **Portal antigo aberto recarrega:** sistema aberto dentro do portal antigo (SGEPortal sem versao 2) recarrega a página de cima, que volta no portal novo (trava de 2 min contra laço). Testes: 86, todos passam.
+
+## v1.14.0 · 2026-11-18 · carregamento novo (publicada 18/11/2026)
+- **Fim da logo enchendo** (Portfólio 31, escolhas do dono: 1-C, 2-A, 3-A). `SGE.carregando()` vira tela cheia **por etapas**: marca "Grupo GPS sge" + linha fina que enche + texto da etapa; cada chamada com texto novo anda a linha, e ela completa e some devagar ao terminar.
+- `data-sge-carregando` e `SGE.logoCarregando()`: **linha fina correndo** no alto do bloco, igual ao Controle de Medições (o texto vai só para o leitor de tela).
+- `SGE.seguro()`: o "salvando" aparece **no próprio botão** apertado (anel + texto, depois ✓ por 1,2 s); sem botão, tela cheia como antes. `opcoes.botao` escolhe o botão; `botao: false` força a tela cheia.
+- Letra da marca (Plus Jakarta Sans 700) entra no @import. Testes: 85, todos passam (1 novo).
+
+## v1.13.0 · 2026-11-17 · padrão visual + kit de peças (publicada 18/11/2026)
+- **Cores e letra do padrão** em `sge-core.css` (aprovado 16-17/11): fundo cinza quente #e9e9e6, cartões brancos, IBM Plex Sans, azul #2f5fb3, cantos 14px, modo escuro dos pilotos. Vale para todo sistema que usa o sge-core (o Controle de Medições não usa).
+- **Kit de peças** `v1/sge-kit.css` (prefixo `k-`): faixa de filtros com botões escuros e botão de período, cartões de números, cartão de conteúdo, composição 100% com legenda clicável, ranking por linha, colunas por dia, tabela com linhas entre colunas e funil, filtro igual ao Excel, selos de status, botão azul de opções com seções, painel ao lado, "O que mudou nesta tela". Modelos: Produtividade da Frota e piloto do Mapa das Varredeiras. Vitrine: `kit.html`.
+- Barra: dentro do portal novo a página ganha a classe `sge-embutido` (o sistema esconde menus próprios, como a barra de baixo do celular).
+
+## barra v1.6.0 · 2026-11-17 (publicada 18/11/2026)
+- **Um visual só** (pedido do dono, 17/11): dentro do portal novo (`SGEPortal.versao >= 2`) a barra do sistema some e manda as páginas dele (rótulo e endereço) para o menu em árvore do portal (`receberMenu`); o portal pede a troca de página por `navegar(href)` (usa o `aoNavegar` do sistema ou troca de endereço). Ctrl K de dentro do sistema abre a busca do portal.
+- Sistema **aberto por fora** no endereço do portal (sge-portal.pages.dev) vai para dentro do portal na mesma página (`#/u/<caminho>`). Não vai quando: já está numa moldura, é outro endereço, é o próprio portal, ou tem a marca `sge_fora=1` (sistema que o portal abre em aba própria; vale para a aba toda).
+- Portal antigo (sem versão 2): tudo igual a antes. 4 testes novos (84 no total, todos passam).
+
 ## v1.12.0 · 2026-11-11
 - Ícones novos da barra: Sair vira uma porta e Tema vira sol com lua (portfólio aprovado pelo dono). Valem para todos os sistemas que usam o sge-core.
 

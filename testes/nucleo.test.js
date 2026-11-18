@@ -93,24 +93,80 @@ test('SGE.rascunho guarda o formulário mas nunca a senha', () => {
     fechar();
 });
 
-test('carregando mostra a logo enchendo; data-sge-carregando ganha a logo sozinho', async () => {
+test('carregando: tela cheia com a logo Grupo GPS + sge; data-sge-carregando ganha a linha do Medições sozinho', async () => {
     const { w, fechar } = montar({ html: '<div id="parte" data-sge-carregando="Carregando pendências…"></div>' });
-    w.SGE.carregando(true, 'Salvando...');
+    w.SGE.carregando(true, 'Conectando');
     const tela = w.document.querySelector('.sge-carregando');
-    assert.ok(tela.querySelector('svg.sge-logo-enchendo'));
-    assert.equal(tela.lastChild.textContent, 'Salvando...');
+    assert.ok(tela.querySelector('.sge-carga-gps .sge-carga-liq'), 'logo do Grupo GPS enchendo');
+    assert.ok(tela.querySelector('.sge-carga-sge'), 'logo do sge embaixo');
+    assert.equal(tela.querySelector('.sge-carga-etapa').textContent, 'Conectando');
+    w.SGE.carregando(true, 'Carregando dados'); // nova etapa: o texto troca
+    assert.equal(tela.querySelector('.sge-carga-etapa').textContent, 'Carregando dados');
     w.SGE.carregando(false);
-    assert.equal(w.document.querySelector('.sge-carregando'), null);
+    assert.ok(w.document.querySelector('.sge-carregando'), 'ainda falta um fechar');
+    w.SGE.carregando(false);
+    assert.equal(w.document.querySelector('.sge-carregando'), null); // espera curta: some na hora
     await new Promise((r) => setTimeout(r, 0)); // espera a página terminar de abrir
     const parte = w.document.getElementById('parte');
-    assert.ok(parte.querySelector('svg.sge-logo-enchendo'));
+    assert.ok(parte.querySelector(':scope > .sge-linha-carga'));
     assert.ok(parte.classList.contains('sge-carregando-local'));
+    assert.equal(parte.getAttribute('aria-label'), 'Carregando pendências…');
     // marcado depois que a página abriu também ganha
     const novo = w.document.createElement('div');
     novo.setAttribute('data-sge-carregando', '');
     w.document.body.appendChild(novo);
     await new Promise((r) => setTimeout(r, 0));
-    assert.ok(novo.querySelector('svg.sge-logo-enchendo'));
-    assert.equal(typeof w.SGE.logoCarregando, 'function');
+    assert.ok(novo.querySelector('.sge-linha-carga'));
+    assert.ok(w.SGE.logoCarregando().classList.contains('sge-linha-carga'));
+    fechar();
+});
+
+test('seguro: o "salvando" aparece no botão apertado, depois ✓ e volta ao normal', async () => {
+    const { w, fechar } = montar({ html: '<button id="b"><b>Salvar</b></button><button id="c">Excluir</button>' });
+    const b = w.document.getElementById('b');
+    let soltar;
+    b.addEventListener('click', () => { w.SGE.seguro(() => new Promise((r) => { soltar = r; }), { texto: 'Salvando…' }); });
+    b.click();
+    assert.ok(b.querySelector('.sge-anel'));
+    assert.ok(b.disabled);
+    assert.match(b.textContent, /Salvando/);
+    assert.equal(w.document.querySelector('.sge-carregando'), null, 'sem tela cheia');
+    soltar({ data: 1 });
+    await new Promise((r) => setTimeout(r, 0));
+    assert.equal(b.textContent, '✓Salvo');
+    await new Promise((r) => setTimeout(r, 1300));
+    assert.equal(b.innerHTML, '<b>Salvar</b>');
+    assert.equal(b.disabled, false);
+    // deu erro: volta na hora, sem ✓
+    const c = w.document.getElementById('c');
+    c.addEventListener('click', () => { w.SGE.seguro(async () => ({ error: { message: 'falhou' } })); });
+    c.click();
+    await new Promise((r) => setTimeout(r, 0));
+    assert.equal(c.textContent, 'Excluir');
+    // sem botão apertado: tela cheia, como antes
+    let fim;
+    const p = w.SGE.seguro(() => new Promise((r) => { fim = r; }), { botao: false });
+    assert.ok(w.document.querySelector('.sge-carregando'));
+    fim(null); await p;
+    fechar();
+});
+
+test('portal antigo aberto: o sge-core novo recarrega a página de cima uma vez (trava de 2 min)', () => {
+    const { w, fechar } = montar({ html: '' });
+    const P = w.SGE;
+    assert.equal(P._ePortalAntigo({ registrarBarra() {} }), true, 'sem versão = antigo');
+    assert.equal(P._ePortalAntigo({ registrarBarra() {}, versao: 2 }), false, 'portal novo');
+    assert.equal(P._ePortalAntigo(null), false);
+    const guardado = {};
+    let recarregou = 0;
+    const topo = { SGEPortal: { registrarBarra() {} }, sessionStorage: { getItem: (k) => guardado[k] || null, setItem: (k, v) => { guardado[k] = v; } }, location: { reload: () => { recarregou++; } } };
+    const janela = { top: topo };
+    assert.equal(P._recarregarPortalAntigo(janela), true);
+    assert.equal(P._recarregarPortalAntigo(janela), false, 'trava: não recarrega de novo logo em seguida');
+    assert.equal(recarregou, 1);
+    topo.SGEPortal.versao = 2; delete guardado.sge_recarregou_portal;
+    assert.equal(P._recarregarPortalAntigo(janela), false, 'portal novo: não recarrega');
+    const solta = { top: null }; solta.top = solta;
+    assert.equal(P._recarregarPortalAntigo(solta), false, 'fora de moldura: nada');
     fechar();
 });

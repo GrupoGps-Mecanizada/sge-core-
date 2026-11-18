@@ -71,6 +71,8 @@ async function abrir({ opcoes = {}, cfg = {}, entrar = false, url = 'https://sge
     const supa = supabaseFalso(Object.assign({ sistemas: { data: { ativo: true, nome: 'Maria Teste', sistemas: SISTEMAS }, error: null } }, cfg));
     const m = montar({ supa, url, extras: ['sge-icones.js', 'sge-barra.js'], antes: silenciar });
     if (entrar) await m.w.SGE.acesso.entrar('sst');
+    m.paraPortal = [];
+    m.w.SGE.barra._irFora = (u) => m.paraPortal.push(u);
     if (antesDeMontar) antesDeMontar(m.w);
     const barra = m.w.SGE.barra.montar(Object.assign({ sistema: 'sst', nome: 'SST', area: 'Mecanizada', inicio: '/sst/', secoes: SECOES }, opcoes));
     await pausa(5);
@@ -343,6 +345,7 @@ test('revisão: lista guardada é de cada usuário (não mostra a lista de outra
         w.sessionStorage.setItem('sge_barra_sistemas', outra);
         w.sessionStorage.setItem('sge_barra_sistemas:u-2', outra);
     } });
+    m.w.SGE.barra._irFora = () => {}; // aberto por fora: aqui não interessa
     const barra = m.w.SGE.barra.montar({ sistema: 'sst', nome: 'SST' });
     await pausa(5);
     barra.host.shadowRoot.querySelector('[data-chave="busca"]').click(); await pausa(5);
@@ -415,6 +418,53 @@ test('dentro do portal: registra a barra e usa o portal para abrir, voltar e sai
     assert.deepEqual(feitos, ['registrou', 'abrir efetivo', 'inicio', 'sair']);
     assert.equal(t.idas.length, 0);
     t.fechar();
+});
+
+test('portal novo (versao 2): a barra some, manda as páginas para a árvore e troca de página quando o portal pede', async () => {
+    const recebidos = [];
+    const navegou = [];
+    const portal = { versao: 2, abrir() {}, inicio() {}, sair() {}, entrar() {}, registrarBarra() {}, receberMenu: (janela, d) => recebidos.push(d), buscar: () => navegou.push('busca do portal') };
+    const t = await abrir({ antesDeMontar: (w) => { w.SGE.barra._acharPortal = () => portal; }, opcoes: { aoNavegar: (h) => navegou.push(h) } });
+    assert.equal(t.barra.host.style.display, 'none');
+    const ultimo = recebidos[recebidos.length - 1];
+    assert.ok(Array.isArray(ultimo.secoes) && ultimo.secoes.length > 0);
+    assert.ok(ultimo.secoes.every((s) => typeof s.rotulo === 'string'));
+    const algumHref = ultimo.secoes.map((s) => s.href || (s.itens && s.itens[0] && s.itens[0].href)).find(Boolean);
+    ultimo.navegar(algumHref);
+    t.w.document.dispatchEvent(new t.w.KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    assert.deepEqual(navegou, [algumHref, 'busca do portal']);
+    t.fechar();
+});
+
+test('portal antigo (sem versao 2): a barra continua aparecendo como antes', async () => {
+    const portal = { abrir() {}, inicio() {}, sair() {}, entrar() {}, registrarBarra() {} };
+    const t = await abrir({ antesDeMontar: (w) => { w.SGE.barra._acharPortal = () => portal; } });
+    assert.notEqual(t.barra.host.style.display, 'none');
+    assert.ok(t.$('.barra'));
+    t.fechar();
+});
+
+test('aberto por fora no endereço do portal: a barra leva para dentro do portal; aberto pelo portal (sge_fora): fica', async () => {
+    const t = await abrir();
+    assert.deepEqual(t.paraPortal, ['https://sge-portal.pages.dev/#/u/' + encodeURIComponent('/sst/matriz')]);
+    t.fechar();
+    const f = await abrir({ url: 'https://sge-portal.pages.dev/sst/matriz?sge_fora=1' });
+    assert.deepEqual(f.paraPortal, []);
+    f.fechar();
+});
+
+test('aberto por fora: vai para o portal na mesma página; fica em moldura, fora do portal ou com sge_fora', () => {
+    const { w, fechar } = montar({ extras: ['sge-icones.js', 'sge-barra.js'] });
+    const ir = w.SGE.barra._regras.destinoForaDoPortal;
+    assert.equal(ir('https://sge-portal.pages.dev/sst/matriz?f=1#a', false, false), 'https://sge-portal.pages.dev/#/u/' + encodeURIComponent('/sst/matriz?f=1#a'));
+    assert.equal(ir('https://sge-portal.pages.dev/sst/', true, false), null); // já está dentro do portal
+    assert.equal(ir('https://sge-portal.pages.dev/sst/', false, true), null); // aba aberta pelo portal (abre fora)
+    assert.equal(ir('https://sge-portal.pages.dev/sst/?sge_fora=1', false, false), null);
+    assert.equal(ir('https://sge-portal.pages.dev/', false, false), null); // é o próprio portal
+    assert.equal(ir('https://grupogps-mecanizada.github.io/sst/', false, false), null);
+    assert.equal(ir('http://localhost:8796/', false, false), null);
+    assert.equal(ir('isso nao e endereco', false, false), null);
+    fechar();
 });
 
 test('logo só volta para o início (não abre a lista); no portal, barra clara na cor do portal', async () => {
